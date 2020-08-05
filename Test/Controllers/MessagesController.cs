@@ -140,11 +140,11 @@ namespace Test.Controllers
             return Ok("no message has deleted");
         }
 
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> ForwardMessage(MessageDto messageDto)
-        {
-        }
+        //[HttpPost]
+        //[Authorize]
+        //public async Task<IActionResult> ForwardMessage(MessageDto messageDto)
+        //{
+        //}
 
         public Guid GetUSerID(IEnumerable<Claim> claims) =>
             Guid.Parse(claims
