@@ -214,11 +214,26 @@ namespace Services.MessageSerivces
             return res;
         }
 
-        //public async Task<bool> ForwardMessage(MessageDto messageDto)
-        //{
-        //    var message = _mapper.Map<MessageSender>(messageDto);
-        //    message. = messageDto
-        //}
+        public async Task<bool> ForwardMessage(MessageDto messageDto)
+        {
+            var message = _mapper.Map<MessageSender>(messageDto);
+            message.Id = Guid.NewGuid();
+
+            var messageReciever = new MessageReciever
+            {
+                Id = Guid.NewGuid(),
+                UserId = message.ResendOnId.Value,
+                MessageId = message.MessageId,
+                MessageSenderId = message.Id,
+            };
+
+            var addMessageSender = await _messageSenderRepository.AddAsync(message);
+            var addMessageReciever = await _messageRecieverRepository.AddAsync(messageReciever);
+
+            await _unitOfWork.SaveAsync();
+
+            return true;
+        }
 
         public async Task<List<MessageDto>> GetIamportantSentMessages(Guid id)
             => (await GetSendOrDraftMessagesByAync(id, true))

@@ -11,6 +11,8 @@ using Models.MessageModels;
 using Newtonsoft.Json;
 using Services.Dto.MessageDto;
 using Services.MessageSerivces;
+using Services.UserServices;
+using Test.Models.UserModels;
 
 namespace Test.Controllers
 {
@@ -19,12 +21,14 @@ namespace Test.Controllers
     public class MessagesController : ControllerBase
     {
         private readonly IMessageServices _messageServices;
+        private readonly IUserService _userService;
 
         #region Contructors
 
-        public MessagesController(IMessageServices messageServices)
+        public MessagesController(IMessageServices messageServices, IUserService userService)
         {
             _messageServices = messageServices;
+            _userService = userService;
         }
 
         #endregion Contructors
@@ -35,7 +39,7 @@ namespace Test.Controllers
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
-            var creatorId = GetUSerID(User.Claims);
+            var creatorId = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var message = _messageServices.CreateMessage(creatorId);
             string jasonMessage = JsonConvert.SerializeObject(message);
@@ -49,7 +53,7 @@ namespace Test.Controllers
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
-            var senderId = GetUSerID(User.Claims);
+            var senderId = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             if (await _messageServices.MessageAction(messageDto, true, senderId))
                 return Ok(ResponseMessage.Ok);
@@ -62,7 +66,7 @@ namespace Test.Controllers
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
-            var senderId = GetUSerID(User.Claims);
+            var senderId = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             if (await _messageServices.MessageAction(messageDto, true, senderId))
                 return Ok(ResponseMessage.Ok);
@@ -75,7 +79,7 @@ namespace Test.Controllers
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
-            var id = GetUSerID(User.Claims);
+            var id = _userService.GetUSerIDFromUserClaims(User.Claims);
             var a = await _messageServices.GetMessagesRecievedbyAsync(id);
             return Ok();
         }
@@ -86,7 +90,7 @@ namespace Test.Controllers
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
-            var id = GetUSerID(User.Claims);
+            var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var a = await _messageServices.GetSendOrDraftMessagesByAync(id, true);
             return Ok(a);
@@ -99,7 +103,7 @@ namespace Test.Controllers
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
-            var id = GetUSerID(User.Claims);
+            var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var a = await _messageServices.GetSendOrDraftMessagesByAync(id, false);
             return Ok(a);
@@ -112,7 +116,7 @@ namespace Test.Controllers
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
-            var id = GetUSerID(User.Claims);
+            var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var a = await _messageServices.GetSendOrDraftMessagesByAync(id, false);
             return Ok(a);
@@ -128,12 +132,16 @@ namespace Test.Controllers
         public async Task<IActionResult> DeleteFromInbox(MessageDto messageDto)
             => Ok(await _messageServices.DeleteRecievedMessage(messageDto));
 
+        /// <summary>
+        /// summary
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> ShowDeletedMessage()
         {
             var deletedMessages =
-                await _messageServices.GetDeletedMessage(GetUSerID(User.Claims));
+                await _messageServices.GetDeletedMessage(_userService.GetUSerIDFromUserClaims(User.Claims));
             if (deletedMessages != null)
                 return Ok(deletedMessages);
 
@@ -145,10 +153,5 @@ namespace Test.Controllers
         //public async Task<IActionResult> ForwardMessage(MessageDto messageDto)
         //{
         //}
-
-        public Guid GetUSerID(IEnumerable<Claim> claims) =>
-            Guid.Parse(claims
-                .FirstOrDefault(p => p.Type.Equals(ClaimTypes.NameIdentifier))
-                .Value);
     }
 }

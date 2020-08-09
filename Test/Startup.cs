@@ -8,12 +8,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Models;
 using Repository;
 using Services.MessageSerivces;
 using Services.Shared;
 using Services.UserServices;
 using System;
+using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace Test
@@ -64,6 +67,28 @@ namespace Test
                 mc.AllowNullCollections = false;
                 mc.AddProfile(new MapperProfile());
             });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo()
+                {
+                    Title = "My Api",
+                    Version = "v1",
+                    Description = "this is my api",
+                    Contact = new OpenApiContact()
+                    {
+                        Email = "navidaine123@gmail.com",
+                        Name = "navid"
+                    },
+                    License = new OpenApiLicense()
+                    {
+                        Name = "Licence"
+                    }
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
         }
@@ -82,7 +107,10 @@ namespace Test
 
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My Api v1")
+            );
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

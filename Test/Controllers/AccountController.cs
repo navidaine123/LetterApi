@@ -31,6 +31,7 @@ namespace Test.Controllers
             return Ok("عملیات با موفقیت انجام شد");
         }
 
+        [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var calims = User.Claims.ToList();

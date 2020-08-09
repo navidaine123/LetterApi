@@ -28,6 +28,8 @@ namespace Services.UserServices
         Task<LogInResponseDto> GenerateTokenAsync(LogInDto logIn);
 
         Task<User> RegisterAsync(RegisterDto registerDto);
+
+        Guid GetUSerIDFromUserClaims(IEnumerable<Claim> claims);
     }
 
     public class UserService : IUserService
@@ -139,5 +141,10 @@ namespace Services.UserServices
             }
             return true;
         }
+
+        public Guid GetUSerIDFromUserClaims(IEnumerable<Claim> claims) =>
+            Guid.Parse(claims
+                .FirstOrDefault(p => p.Type.Equals(ClaimTypes.NameIdentifier))
+                .Value);
     }
 }
