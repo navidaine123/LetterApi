@@ -1,4 +1,5 @@
 ﻿using Models.Enums;
+using Models.MessageModels;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -35,5 +36,7 @@ namespace Services.Dto.MessageDto
         public ImportanceLevel ImportanceLevel { get; set; }
 
         public Nullable<DateTime> DueDate { get; set; }
+
+        public MessageReciever ReSendOn { get; set; }
     }
 }

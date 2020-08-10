@@ -16,6 +16,7 @@ using Services.Shared;
 using Services.UserServices;
 using System;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Text;
 
@@ -88,6 +89,14 @@ namespace Test
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "`Token only!!!` - without `Bearer_` prefix",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Scheme = "bearer"
+                });
             });
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);

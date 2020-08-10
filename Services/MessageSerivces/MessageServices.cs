@@ -26,6 +26,8 @@ namespace Services.MessageSerivces
         Task<string> DeleteRecievedMessage(MessageDto messageDto);
 
         Task<List<MessageDto>> GetDeletedMessage(Guid id);
+
+        Task<bool> ForwardMessageAsync(MessageDto messageDto);
     }
 
     public class MessageServices : IMessageServices
@@ -214,20 +216,20 @@ namespace Services.MessageSerivces
             return res;
         }
 
-        public async Task<bool> ForwardMessage(MessageDto messageDto)
+        public async Task<bool> ForwardMessageAsync(MessageDto messageDto)
         {
-            var message = _mapper.Map<MessageSender>(messageDto);
-            message.Id = Guid.NewGuid();
+            var messageSender = _mapper.Map<MessageSender>(messageDto);
+            messageSender.Id = Guid.NewGuid();
 
             var messageReciever = new MessageReciever
             {
                 Id = Guid.NewGuid(),
-                UserId = message.ResendOnId.Value,
-                MessageId = message.MessageId,
-                MessageSenderId = message.Id,
+                UserId = messageSender.ResendOnId.Value,
+                MessageId = messageSender.MessageId,
+                MessageSenderId = messageSender.Id,
             };
 
-            var addMessageSender = await _messageSenderRepository.AddAsync(message);
+            var addMessageSender = await _messageSenderRepository.AddAsync(messageSender);
             var addMessageReciever = await _messageRecieverRepository.AddAsync(messageReciever);
 
             await _unitOfWork.SaveAsync();

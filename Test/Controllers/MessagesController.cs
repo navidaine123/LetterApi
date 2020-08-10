@@ -34,12 +34,14 @@ namespace Test.Controllers
         #endregion Contructors
 
         [HttpGet]
+        [Authorize]
         public IActionResult Create()
         {
-            if (User.Claims == null)
+            var userClaims = User.Claims;
+            if (userClaims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
-            var creatorId = _userService.GetUSerIDFromUserClaims(User.Claims);
+            var creatorId = _userService.GetUSerIDFromUserClaims(userClaims);
 
             var message = _messageServices.CreateMessage(creatorId);
             string jasonMessage = JsonConvert.SerializeObject(message);
@@ -148,10 +150,13 @@ namespace Test.Controllers
             return Ok("no message has deleted");
         }
 
-        //[HttpPost]
-        //[Authorize]
-        //public async Task<IActionResult> ForwardMessage(MessageDto messageDto)
-        //{
-        //}
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ForwardMessage(MessageDto messageDto)
+        {
+            if (await _messageServices.ForwardMessageAsync(messageDto))
+                return Ok("پیام ارجاع داده شد");
+            return BadRequest("خطایی رخ داده است");
+        }
     }
 }

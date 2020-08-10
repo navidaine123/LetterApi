@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Test.Models.UserModels;
 
 namespace Services.Dto.MessageDto
 {
@@ -17,10 +18,12 @@ namespace Services.Dto.MessageDto
 
         public bool IsMarked { get; set; }
 
-        public Nullable<Guid> ResendOnId { get; set; }
+        public MessageReciever ResendOn { get; set; }
 
-        public Guid UserId { get; set; }
+        public virtual ICollection<MessageReciever> MessageRecievers { get; set; }
 
-        public Guid MessageId { get; set; }
+        public User User { get; set; }
+
+        public Message Message { get; set; }
     }
 }
