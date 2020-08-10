@@ -117,6 +117,8 @@ namespace Test.Controllers
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
+            
+
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var a = await _messageServices.GetSendOrDraftMessagesByAync(id, false);
