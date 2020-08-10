@@ -192,17 +192,27 @@ namespace Services.MessageSerivces
         public async Task<string> DeleteSentOrDraftMessage(MsgBoxDTO messageDto)
         {
             var message = _mapper.Map<MessageSender>(messageDto);
+
             message.DeletedDate = DateTime.UtcNow;
 
-            return await _messageSenderRepository.DeleteFromSenders(message);
+            message =
+                await _messageSenderRepository
+                .UpdateAsync(message, messageDto.Id);
+
+            return "حذف شد";
         }
 
         public async Task<string> DeleteRecievedMessage(MsgBoxDTO messageDto)
         {
             var message = _mapper.Map<MessageReciever>(messageDto);
+
             message.DeletedDate = DateTime.UtcNow;
 
-            return await _messageRecieverRepository.DeleteFromReciever(message);
+            message =
+                await _messageRecieverRepository
+                .UpdateAsync(message, messageDto.Id);
+
+            return "حذف شد";
         }
 
         public async Task<List<MsgBoxDTO>> GetDeletedMessage(Guid id)

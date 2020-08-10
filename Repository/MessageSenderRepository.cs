@@ -13,8 +13,6 @@ namespace Repository
     public interface IMessageSenderRepository : IGenericRepository<MessageSender>
     {
         Task<List<MessageSender>> GetMessagesSendByAync(Guid id);
-
-        Task<string> DeleteFromSenders(MessageSender messageSender);
     }
 
     internal class MessageSenderRepository : GenericRepository<MessageSender>, IMessageSenderRepository
@@ -46,24 +44,6 @@ namespace Repository
             catch (Exception e)
             {
                 throw (e);
-            }
-        }
-
-        public async Task<string> DeleteFromSenders(MessageSender messageSender)
-        {
-            try
-            {
-                var message = await _smContext.MessageSenders.FindAsync(messageSender.Id);
-                message = messageSender;
-
-                _smContext.MessageSenders.Update(message);
-                await _smContext.SaveChangesAsync();
-
-                return "پیام مورد نظر با موفقیت از لیست حذف شد";
-            }
-            catch
-            {
-                return "حذف پیام با خطا روبرو شد";
             }
         }
     }

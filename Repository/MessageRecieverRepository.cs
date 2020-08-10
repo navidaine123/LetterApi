@@ -54,23 +54,5 @@ namespace Repository
                 throw (e);
             }
         }
-
-        public async Task<string> DeleteFromReciever(MessageReciever messageReciever)
-        {
-            try
-            {
-                var message = await _smContext.MessageRecievers.FindAsync(messageReciever.Id);
-                message = messageReciever;
-
-                _smContext.MessageRecievers.Update(message);
-                await _smContext.SaveChangesAsync();
-
-                return "پیام مورد نظر با موفقیت از لیست حذف شد";
-            }
-            catch
-            {
-                return "حذف پیام با خطا روبرو شد";
-            }
-        }
     }
 }
