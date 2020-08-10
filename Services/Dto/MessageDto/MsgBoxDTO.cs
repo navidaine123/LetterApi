@@ -41,7 +41,7 @@ namespace Services.Dto.MessageDto
 
         //public string ResendOnFullName { get; set; }
 
-        public List<MessageReciever> ResendTo { get; set; }
+        //public List<MessageReciever> ResendTo { get; set; }
 
         public List<Guid> ResendToIdList { get; set; }
     }
