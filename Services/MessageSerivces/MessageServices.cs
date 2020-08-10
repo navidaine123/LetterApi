@@ -174,7 +174,7 @@ namespace Services.MessageSerivces
         {
             var messages =
                 (await _messageSenderRepository.GetMessagesSendByAync(id))
-                .Where(x => x.DeletedDate == null).ToList();
+                .Where(x => x.DeletedDate == null && x.IsSent == isSent).ToList();
 
             List<MsgBoxDTO> msgBoxDTO = new List<MsgBoxDTO>();
 
