@@ -222,16 +222,21 @@ namespace Services.MessageSerivces
             messageSender.Id = Guid.NewGuid();
             messageSender.ResendOnId = DTO.ResendOnId;
 
-            var messageReciever = new MessageReciever
+            foreach (var item in DTO.ResendToIdList)
             {
-                Id = Guid.NewGuid(),
-                UserId = messageSender.ResendOnId.Value,
-                MessageId = messageSender.MessageId,
-                MessageSenderId = messageSender.Id,
-            };
+                var messageReciever = new MessageReciever
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = item,
+                    MessageId = messageSender.MessageId,
+                    MessageSenderId = messageSender.Id,
+                    IsCc = false,
+                };
+                messageSender.MessageRecievers.Add(messageReciever);
+            }
 
             var addMessageSender = await _messageSenderRepository.AddAsync(messageSender);
-            var addMessageReciever = await _messageRecieverRepository.AddAsync(messageReciever);
+            var addMessageReciever = await _messageRecieverRepository.AddRangeAsync(messageSender.MessageRecievers);
 
             await _unitOfWork.SaveAsync();
 
