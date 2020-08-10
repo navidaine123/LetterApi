@@ -25,7 +25,7 @@ namespace Services.Dto.MessageDto
 
         public DateTime CreateOn { get; set; } = DateTime.UtcNow;
 
-        public Guid CreatedById { get; set; }
+        //public Guid CreatedById { get; set; }
 
         public string CreatedByName { get; set; }
 

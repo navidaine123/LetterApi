@@ -17,7 +17,7 @@ namespace Services.MessageSerivces
 
         Task<bool> MessageAction(SendMsgDTO messageDto, bool isSent, Guid senderId);
 
-        Task<List<MsgBoxDTO>> GetSendOrDraftMessagesByAync(Guid id, bool isSent);
+        Task<List<MsgBoxDTO>> GetSendOrDraftMessagesByIdAync(Guid id, bool isSent);
 
         Task<List<MsgBoxDTO>> GetMessagesRecievedbyAsync(Guid id);
 
@@ -175,7 +175,7 @@ namespace Services.MessageSerivces
         /// <param name="id"></param>
         /// <param name="isSent"></param>
         /// <returns></returns>
-        public async Task<List<MsgBoxDTO>> GetSendOrDraftMessagesByAync(Guid id, bool isSent)
+        public async Task<List<MsgBoxDTO>> GetSendOrDraftMessagesByIdAync(Guid id, bool isSent)
         {
             var messages =
                 (await _messageSenderRepository.GetMessagesSendByAync(id))
@@ -254,8 +254,9 @@ namespace Services.MessageSerivces
         }
 
         public async Task<List<MsgBoxDTO>> GetImportantSentMessages(Guid id)
-            => (await GetMessagesRecievedbyAsync(id))
-            .Concat((await GetSendOrDraftMessagesByAync(id, true)))
+        => (await GetMessagesRecievedbyAsync(id))
+            .Concat((await GetSendOrDraftMessagesByIdAync(id, true)))
+            .ToList()
             .Where(p => p.ImportanceLevel == ImportanceLevel.Important)
             .ToList();
     }

@@ -93,7 +93,7 @@ namespace Test.Controllers
 
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
-            var a = await _messageServices.GetSendOrDraftMessagesByAync(id, true);
+            var a = await _messageServices.GetSendOrDraftMessagesByIdAync(id, true);
             return Ok(a);
         }
 
@@ -106,7 +106,7 @@ namespace Test.Controllers
 
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
-            var a = await _messageServices.GetSendOrDraftMessagesByAync(id, false);
+            var a = await _messageServices.GetSendOrDraftMessagesByIdAync(id, false);
             return Ok(a);
         }
 

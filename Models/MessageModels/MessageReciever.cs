@@ -20,6 +20,7 @@ namespace Models.MessageModels
 
         public bool IsMarked { get; set; }
 
+        [ForeignKey("User")]
         public Guid UserId { get; set; }
 
         public User User { get; set; }
@@ -29,6 +30,7 @@ namespace Models.MessageModels
 
         public Message Message { get; set; }
 
+        [ForeignKey("MessageSender")]
         public Guid MessageSenderId { get; set; }
 
         public MessageSender MessageSender { get; set; }
