@@ -218,22 +218,18 @@ namespace Services.MessageSerivces
         public async Task<List<MsgBoxDTO>> GetDeletedMessage(Guid id)
         {
             var inboxMessages = _mapper.Map<List<MsgBoxDTO>>
-                (
-                (await _messageRecieverRepository.GetMessagesRecieveByAync(id))
-                .Where(x => x.DeletedDate != null)
-                );
+                ((await _messageRecieverRepository
+                .GetMessagesRecieveByAync(id))
+                .Where(x => x.DeletedDate != null));
 
             var outboxMessages = _mapper.Map<List<MsgBoxDTO>>
-                (
-                (await _messageSenderRepository.GetMessagesSendByAync(id))
-                .Where(x => x.DeletedDate != null)
-                );
+                ((await _messageSenderRepository
+                .GetMessagesSendByAync(id))
+                .Where(x => x.DeletedDate != null));
 
-            var res = new List<MsgBoxDTO>();
-            res.AddRange(inboxMessages);
-            res.AddRange(outboxMessages);
-
-            return res;
+            return inboxMessages
+                .Concat(outboxMessages)
+                .ToList();
         }
 
         public async Task<bool> ForwardMessageAsync(MsgBoxDTO DTO)
