@@ -25,9 +25,9 @@ namespace Services.Shared
             CreateMap<Message, SendMsgDTO>()
                 .ReverseMap()
                 .ForMember(x => x.Id, option => option.Ignore())
-                .ForMember(x=>x.CreatedBy,option=>option.Ignore());
+                .ForMember(x => x.CreatedBy, option => option.Ignore());
 
-            CreateMap<MessageSender, SendMsgDTO>()
+            CreateMap<MessageSender, MsgBoxDTO>()
                 .ForMember
                 (x => x.To, option => option
                    .MapFrom(src => src.MessageRecievers

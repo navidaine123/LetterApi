@@ -174,11 +174,13 @@ namespace Services.MessageSerivces
         {
             var messages =
                 (await _messageSenderRepository.GetMessagesSendByAync(id))
-                .Where(x => x.DeletedDate == null);
+                .Where(x => x.DeletedDate == null).ToList();
 
-            var messageDto = _mapper.Map<List<MsgBoxDTO>>(messages);
+            List<MsgBoxDTO> msgBoxDTO = new List<MsgBoxDTO>();
 
-            return messageDto;
+            _mapper.Map(messages, msgBoxDTO);
+
+            return msgBoxDTO;
         }
 
         public async Task<string> DeleteSentOrDraftMessage(MsgBoxDTO messageDto)
