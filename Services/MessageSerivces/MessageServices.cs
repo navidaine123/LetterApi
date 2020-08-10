@@ -220,7 +220,7 @@ namespace Services.MessageSerivces
         {
             var messageSender = _mapper.Map<MessageSender>(DTO);
             messageSender.Id = Guid.NewGuid();
-            messageSender.ResendOnId = DTO.ResendOnId;
+            messageSender.ResendOnId = DTO.Id;
 
             foreach (var item in DTO.ResendToIdList)
             {

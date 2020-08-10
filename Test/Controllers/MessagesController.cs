@@ -153,8 +153,6 @@ namespace Test.Controllers
         [Authorize]
         public async Task<IActionResult> ForwardMessage(MsgBoxDTO dTO)
         {
-            dTO.ResendOnId = _userService.GetUSerIDFromUserClaims(User.Claims);
-
             if (await _messageServices.ForwardMessageAsync(dTO))
                 return Ok("پیام ارجاع داده شد");
             return BadRequest("خطایی رخ داده است");

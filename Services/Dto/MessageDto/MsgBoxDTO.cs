@@ -37,9 +37,9 @@ namespace Services.Dto.MessageDto
 
         public Nullable<DateTime> DueDate { get; set; }
 
-        public Guid ResendOnId { get; set; }
+        //public Guid ResendOnId { get; set; }
 
-        public string ResendOnFullName { get; set; }
+        //public string ResendOnFullName { get; set; }
 
         public List<MessageReciever> ResendTo { get; set; }
 
