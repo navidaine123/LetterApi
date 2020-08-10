@@ -23,11 +23,11 @@ namespace Test.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> LogIn(LogInDto user)
+        public async Task<IActionResult> LogInAsync(LogInDto user)
         {
             try
             {
-                var res = await _userService.GenerateTokenAsync(user);
+                LogInResponseDto res = await _userService.GenerateTokenAsync(user);
                 if (res != null)
                     return Ok(res);
 
