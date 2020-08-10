@@ -254,17 +254,9 @@ namespace Services.MessageSerivces
         }
 
         public async Task<List<MsgBoxDTO>> GetImportantSentMessages(Guid id)
-        {
-            var data = (await _messageRepository
-                .GetAllSendMessagesByUserIdAsync(id))
-                .Where(p => p.ImportanceLevel == ImportanceLevel.Important)
-                .ToList();
-
-            List<MsgBoxDTO> dto = new List<MsgBoxDTO>();
-
-            _mapper.Map(data, dto);
-
-            return dto;
-        }
+            => (await GetMessagesRecievedbyAsync(id))
+            .Concat((await GetSendOrDraftMessagesByAync(id, true)))
+            .Where(p => p.ImportanceLevel == ImportanceLevel.Important)
+            .ToList();
     }
 }
