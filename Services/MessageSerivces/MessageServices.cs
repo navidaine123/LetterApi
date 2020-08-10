@@ -13,21 +13,21 @@ namespace Services.MessageSerivces
 {
     public interface IMessageServices
     {
-        MessageDto CreateMessage(Guid creator);
+        SendMsgDTO CreateMessage(Guid creator);
 
-        Task<bool> MessageAction(MessageDto messageDto, bool isSent, Guid senderId);
+        Task<bool> MessageAction(SendMsgDTO messageDto, bool isSent, Guid senderId);
 
-        Task<List<MessageDto>> GetSendOrDraftMessagesByAync(Guid id, bool isSent);
+        Task<List<SendMsgDTO>> GetSendOrDraftMessagesByAync(Guid id, bool isSent);
 
-        Task<List<MessageDto>> GetMessagesRecievedbyAsync(Guid id);
+        Task<List<SendMsgDTO>> GetMessagesRecievedbyAsync(Guid id);
 
-        Task<string> DeleteSentOrDraftMessage(MessageDto messageDto);
+        Task<string> DeleteSentOrDraftMessage(SendMsgDTO messageDto);
 
-        Task<string> DeleteRecievedMessage(MessageDto messageDto);
+        Task<string> DeleteRecievedMessage(SendMsgDTO messageDto);
 
-        Task<List<MessageDto>> GetDeletedMessage(Guid id);
+        Task<List<SendMsgDTO>> GetDeletedMessage(Guid id);
 
-        Task<bool> ForwardMessageAsync(MessageDto messageDto);
+        Task<bool> ForwardMessageAsync(MsgBoxDTO DTO);
     }
 
     public class MessageServices : IMessageServices
@@ -55,9 +55,9 @@ namespace Services.MessageSerivces
 
         #endregion constructors
 
-        public MessageDto CreateMessage(Guid creator)
+        public SendMsgDTO CreateMessage(Guid creator)
         {
-            var messageDto = new MessageDto()
+            var messageDto = new SendMsgDTO()
             {
                 CreatedById = creator,
                 Id = Guid.NewGuid(),
@@ -74,7 +74,7 @@ namespace Services.MessageSerivces
         /// <param name="messageDto"></param>
         /// <param name="isSent"></param>
         /// <returns></returns>
-        public async Task<bool> MessageAction(MessageDto messageDto, bool isSent, Guid senderId)
+        public async Task<bool> MessageAction(SendMsgDTO messageDto, bool isSent, Guid senderId)
         {
             try
             {
@@ -118,7 +118,7 @@ namespace Services.MessageSerivces
 
         private string GenerateMessageNumber(string code) => code + DateTime.UtcNow.Date.ToString();
 
-        public List<MessageReciever> MessageRecieversList(MessageDto messageDto, MessageSender messageSender, Message message)
+        public List<MessageReciever> MessageRecieversList(SendMsgDTO messageDto, MessageSender messageSender, Message message)
         {
             var messageReciever = new List<MessageReciever>();
 
@@ -151,13 +151,13 @@ namespace Services.MessageSerivces
             return messageReciever;
         }
 
-        public async Task<List<MessageDto>> GetMessagesRecievedbyAsync(Guid id)
+        public async Task<List<SendMsgDTO>> GetMessagesRecievedbyAsync(Guid id)
         {
             var messages =
                 (await _messageRecieverRepository.GetMessagesRecieveByAync(id))
                 .Where(x => x.DeletedDate == null);
 
-            var messageDto = _mapper.Map<List<MessageDto>>(messages);
+            var messageDto = _mapper.Map<List<SendMsgDTO>>(messages);
 
             return null;
         }
@@ -168,18 +168,18 @@ namespace Services.MessageSerivces
         /// <param name="id"></param>
         /// <param name="isSent"></param>
         /// <returns></returns>
-        public async Task<List<MessageDto>> GetSendOrDraftMessagesByAync(Guid id, bool isSent)
+        public async Task<List<SendMsgDTO>> GetSendOrDraftMessagesByAync(Guid id, bool isSent)
         {
             var messages =
                 (await _messageSenderRepository.GetMessagesSendByAync(id))
                 .Where(x => x.DeletedDate == null);
 
-            var messageDto = _mapper.Map<List<MessageDto>>(messages);
+            var messageDto = _mapper.Map<List<SendMsgDTO>>(messages);
 
             return messageDto;
         }
 
-        public async Task<string> DeleteSentOrDraftMessage(MessageDto messageDto)
+        public async Task<string> DeleteSentOrDraftMessage(SendMsgDTO messageDto)
         {
             var message = _mapper.Map<MessageSender>(messageDto);
             message.DeletedDate = DateTime.UtcNow;
@@ -187,7 +187,7 @@ namespace Services.MessageSerivces
             return await _messageSenderRepository.DeleteFromSenders(message);
         }
 
-        public async Task<string> DeleteRecievedMessage(MessageDto messageDto)
+        public async Task<string> DeleteRecievedMessage(SendMsgDTO messageDto)
         {
             var message = _mapper.Map<MessageReciever>(messageDto);
             message.DeletedDate = DateTime.UtcNow;
@@ -195,31 +195,32 @@ namespace Services.MessageSerivces
             return await _messageRecieverRepository.DeleteFromReciever(message);
         }
 
-        public async Task<List<MessageDto>> GetDeletedMessage(Guid id)
+        public async Task<List<SendMsgDTO>> GetDeletedMessage(Guid id)
         {
-            var inboxMessages = _mapper.Map<List<MessageDto>>
+            var inboxMessages = _mapper.Map<List<SendMsgDTO>>
                 (
                 (await _messageRecieverRepository.GetMessagesRecieveByAync(id))
                 .Where(x => x.DeletedDate != null)
                 );
 
-            var outboxMessages = _mapper.Map<List<MessageDto>>
+            var outboxMessages = _mapper.Map<List<SendMsgDTO>>
                 (
                 (await _messageSenderRepository.GetMessagesSendByAync(id))
                 .Where(x => x.DeletedDate != null)
                 );
 
-            var res = new List<MessageDto>();
+            var res = new List<SendMsgDTO>();
             res.AddRange(inboxMessages);
             res.AddRange(outboxMessages);
 
             return res;
         }
 
-        public async Task<bool> ForwardMessageAsync(MessageDto messageDto)
+        public async Task<bool> ForwardMessageAsync(MsgBoxDTO DTO)
         {
-            var messageSender = _mapper.Map<MessageSender>(messageDto);
+            var messageSender = _mapper.Map<MessageSender>(DTO);
             messageSender.Id = Guid.NewGuid();
+            messageSender.ResendOnId = DTO.ResendOnId;
 
             var messageReciever = new MessageReciever
             {
@@ -237,7 +238,7 @@ namespace Services.MessageSerivces
             return true;
         }
 
-        public async Task<List<MessageDto>> GetIamportantSentMessages(Guid id)
+        public async Task<List<SendMsgDTO>> GetIamportantSentMessages(Guid id)
             => (await GetSendOrDraftMessagesByAync(id, true))
             .Where(x => x.ImportanceLevel == ImportanceLevel.Important)
             .ToList();

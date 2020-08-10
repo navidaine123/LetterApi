@@ -50,7 +50,7 @@ namespace Test.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendMessage(MessageDto messageDto)
+        public async Task<IActionResult> SendMessage(SendMsgDTO messageDto)
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -63,7 +63,7 @@ namespace Test.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DraftMessage(MessageDto messageDto)
+        public async Task<IActionResult> DraftMessage(SendMsgDTO messageDto)
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -126,12 +126,12 @@ namespace Test.Controllers
 
         [HttpDelete]
         [Authorize]
-        public async Task<IActionResult> DeleteFromOutboxOrDraft(MessageDto messageDto)
+        public async Task<IActionResult> DeleteFromOutboxOrDraft(SendMsgDTO messageDto)
             => Ok(await _messageServices.DeleteSentOrDraftMessage(messageDto));
 
         [HttpDelete]
         [Authorize]
-        public async Task<IActionResult> DeleteFromInbox(MessageDto messageDto)
+        public async Task<IActionResult> DeleteFromInbox(SendMsgDTO messageDto)
             => Ok(await _messageServices.DeleteRecievedMessage(messageDto));
 
         /// <summary>
@@ -152,9 +152,11 @@ namespace Test.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> ForwardMessage(MessageDto messageDto)
+        public async Task<IActionResult> ForwardMessage(MsgBoxDTO dTO)
         {
-            if (await _messageServices.ForwardMessageAsync(messageDto))
+            dTO.ResendOnId = _userService.GetUSerIDFromUserClaims(User.Claims);
+
+            if (await _messageServices.ForwardMessageAsync(dTO))
                 return Ok("پیام ارجاع داده شد");
             return BadRequest("خطایی رخ داده است");
         }

@@ -7,7 +7,7 @@ using Test.Models.UserModels;
 
 namespace Services.Dto.MessageDto
 {
-    public class MessageDto
+    public class MsgBoxDTO
     {
         public List<Guid> To { get; set; }
 
@@ -23,7 +23,7 @@ namespace Services.Dto.MessageDto
 
         public string Content { get; set; }
 
-        public DateTime CreateOn { get; set; } = DateTime.UtcNow;
+        public DateTime CreateOn { get; set; }
 
         public Guid CreatedById { get; set; }
 
@@ -37,6 +37,10 @@ namespace Services.Dto.MessageDto
 
         public Nullable<DateTime> DueDate { get; set; }
 
-        public MessageReciever ReSendOn { get; set; }
+        public Guid ResendOnId { get; set; }
+
+        public string ResendOnFullName { get; set; }
+
+        public List<MessageReciever> ResendTo { get; set; }
     }
 }

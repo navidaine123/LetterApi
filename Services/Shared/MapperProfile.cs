@@ -22,11 +22,11 @@ namespace Services.Shared
                 .ReverseMap()
                 .ForMember(x => x.Id, option => option.Ignore());
 
-            CreateMap<Message, MessageDto>()
+            CreateMap<Message, SendMsgDTO>()
                 .ReverseMap()
                 .ForMember(x => x.Id, option => option.Ignore());
 
-            CreateMap<MessageSender, MessageDto>()
+            CreateMap<MessageSender, SendMsgDTO>()
                 .ForMember
                 (x => x.To, option => option
                    .MapFrom(src => src.MessageRecievers
@@ -35,7 +35,8 @@ namespace Services.Shared
                 (x => x.Cc, option => option
                    .MapFrom(src => src.MessageRecievers
                    .Where(p => p.IsCc == true).Select(x => x.UserId)));
-            CreateMap<MessageReciever, MessageDto>();
+
+            CreateMap<MessageReciever, SendMsgDTO>();
         }
     }
 }
