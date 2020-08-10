@@ -44,9 +44,8 @@ namespace Test.Controllers
             var creatorId = _userService.GetUSerIDFromUserClaims(userClaims);
 
             var message = _messageServices.CreateMessage(creatorId);
-            string jasonMessage = JsonConvert.SerializeObject(message);
 
-            return Ok(jasonMessage);
+            return Ok(message);
         }
 
         [HttpPost]
@@ -126,12 +125,12 @@ namespace Test.Controllers
 
         [HttpDelete]
         [Authorize]
-        public async Task<IActionResult> DeleteFromOutboxOrDraft(SendMsgDTO messageDto)
+        public async Task<IActionResult> DeleteFromOutboxOrDraft(MsgBoxDTO messageDto)
             => Ok(await _messageServices.DeleteSentOrDraftMessage(messageDto));
 
         [HttpDelete]
         [Authorize]
-        public async Task<IActionResult> DeleteFromInbox(SendMsgDTO messageDto)
+        public async Task<IActionResult> DeleteFromInbox(MsgBoxDTO messageDto)
             => Ok(await _messageServices.DeleteRecievedMessage(messageDto));
 
         /// <summary>
