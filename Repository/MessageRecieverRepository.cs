@@ -31,21 +31,29 @@ namespace Repository
         #endregion constructors
 
         public async Task<List<MessageReciever>> AddRangeAsync(List<MessageReciever> messageRecievers)
-        { 
+        {
             await _smContext.MessageRecievers.AddRangeAsync(messageRecievers);
 
             return messageRecievers;
         }
-                
-            
-        
 
         public async Task<List<MessageReciever>> GetMessagesRecieveByAync(Guid id)
-            => await _smContext.MessageRecievers
-                .Include(x => x.Message)
-                .Include(x => x.MessageSender)
-                .Where(x => x.UserId == id)
-                .ToListAsync();
+        {
+            try
+            {
+                var a = await _smContext.MessageRecievers
+                    .Include(x => x.Message)
+                    .Include(x => x.MessageSender)
+                    .Where(x => x.UserId == id)
+                    .ToListAsync();
+
+                return a;
+            }
+            catch (Exception e)
+            {
+                throw (e);
+            }
+        }
 
         public async Task<string> DeleteFromReciever(MessageReciever messageReciever)
         {

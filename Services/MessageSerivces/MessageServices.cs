@@ -157,11 +157,14 @@ namespace Services.MessageSerivces
         {
             var messages =
                 (await _messageRecieverRepository.GetMessagesRecieveByAync(id))
-                .Where(x => x.DeletedDate == null);
+                .Where(x => x.DeletedDate == null)
+                .ToList();
 
-            var messageDto = _mapper.Map<List<MsgBoxDTO>>(messages);
+            List<MsgBoxDTO> msgBoxDTO = new List<MsgBoxDTO>();
 
-            return null;
+            _mapper.Map(messages, msgBoxDTO);
+
+            return msgBoxDTO;
         }
 
         /// <summary>
@@ -174,7 +177,8 @@ namespace Services.MessageSerivces
         {
             var messages =
                 (await _messageSenderRepository.GetMessagesSendByAync(id))
-                .Where(x => x.DeletedDate == null && x.IsSent == isSent).ToList();
+                .Where(x => x.DeletedDate == null && x.IsSent == isSent)
+                .ToList();
 
             List<MsgBoxDTO> msgBoxDTO = new List<MsgBoxDTO>();
 
