@@ -15,6 +15,10 @@ namespace Repository
         Task<T> GetAsync(object key);
 
         Task<T> AddAsync(T t);
+
+        Task<T> UpdateAsync(T t, object key);
+
+        T Delete(T t);
     }
 
     public class GenericRepository<T> : IGenericRepository<T> where T : class

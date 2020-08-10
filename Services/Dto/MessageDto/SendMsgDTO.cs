@@ -27,7 +27,7 @@ namespace Services.Dto.MessageDto
 
         public Guid CreatedById { get; set; }
 
-        public string CreatedByFullName { get; set; }
+        public string CreatedByName { get; set; }
 
         public string MessageNumber { get; set; }
 

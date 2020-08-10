@@ -13,7 +13,7 @@ namespace Services.MessageSerivces
 {
     public interface IMessageServices
     {
-        SendMsgDTO CreateMessage(Guid creator);
+        Task<Message> CreateMessageAsync(Guid creator);
 
         Task<bool> MessageAction(SendMsgDTO messageDto, bool isSent, Guid senderId);
 
@@ -55,17 +55,19 @@ namespace Services.MessageSerivces
 
         #endregion constructors
 
-        public SendMsgDTO CreateMessage(Guid creator)
+        public async Task<Message> CreateMessageAsync(Guid creatorId)
         {
-            var messageDto = new SendMsgDTO()
+            var message = new Message()
             {
-                CreatedById = creator,
-                Id = Guid.NewGuid(),
-                MessageCode = GenerateMessageCode().GetAwaiter().GetResult(),
+                CreatedById = creatorId,
+                MessageCode = await GenerateMessageCodeAsync(),
             };
-            messageDto.MessageNumber = GenerateMessageNumber(messageDto.MessageCode);
+            message.MessageNumber = GenerateMessageNumber(message.MessageCode);
 
-            return messageDto;
+            await _unitOfWork.MessageRepository.AddAsync(message);
+            await _unitOfWork.SaveAsync();
+
+            return message;
         }
 
         /// <summary>
@@ -80,19 +82,21 @@ namespace Services.MessageSerivces
             {
                 if (messageDto.To == null)
                     return false;
+                var message = await _unitOfWork.MessageRepository.GetAsync(messageDto.Id);
+                if (message == null)
+                    return false;
+                _mapper.Map(messageDto, message);
 
-                var message = _mapper.Map<Message>(messageDto);
                 var messageSender = new MessageSender
                 {
-                    Message = message,
+                    MessageId = messageDto.Id,
                     IsSent = isSent,
-                    Id = Guid.NewGuid(),
-                    UserId = senderId,
+                    UserId = senderId
                 };
 
-                var messageRecievers = MessageRecieversList(messageDto, messageSender, message);
+                var messageRecievers = await MessageRecieversListAsync(messageDto, messageSender);
 
-                var messageResult = await _messageRepository.AddAsync(message);
+                var messageResult = await _messageRepository.UpdateAsync(message, message.Id);
                 var messageSenderResult = await _messageSenderRepository.AddAsync(messageSender);
                 var messageRecieverResult = await _messageRecieverRepository.AddRangeAsync(messageRecievers);
 
@@ -106,7 +110,7 @@ namespace Services.MessageSerivces
             }
         }
 
-        private async Task<string> GenerateMessageCode()
+        private async Task<string> GenerateMessageCodeAsync()
         {
             var message = await _messageRepository.GetLastOfMessagesAsync();
 
@@ -118,7 +122,7 @@ namespace Services.MessageSerivces
 
         private string GenerateMessageNumber(string code) => code + DateTime.UtcNow.Date.ToString();
 
-        private List<MessageReciever> MessageRecieversList(SendMsgDTO messageDto, MessageSender messageSender, Message message)
+        private async Task<List<MessageReciever>> MessageRecieversListAsync(SendMsgDTO messageDto, MessageSender messageSender)
         {
             var messageReciever = new List<MessageReciever>();
 
@@ -128,8 +132,7 @@ namespace Services.MessageSerivces
                 {
                     messageReciever.Add(new MessageReciever()
                     {
-                        Id = Guid.NewGuid(),
-                        Message = message,
+                        MessageId = messageDto.Id,
                         IsCc = true,
                         MessageSender = messageSender,
                         UserId = item,
@@ -140,11 +143,10 @@ namespace Services.MessageSerivces
             {
                 messageReciever.Add(new MessageReciever()
                 {
-                    Id = Guid.NewGuid(),
-                    Message = message,
+                    MessageId = messageDto.Id,
                     IsCc = false,
                     MessageSender = messageSender,
-                    UserId = item,
+                    UserId = item
                 });
             }
 
@@ -236,7 +238,7 @@ namespace Services.MessageSerivces
             }
 
             var addMessageSender = await _messageSenderRepository.AddAsync(messageSender);
-            var addMessageReciever = await _messageRecieverRepository.AddRangeAsync(messageSender.MessageRecievers);
+            //var addMessageReciever = await _messageRecieverRepository.AddRangeAsync(messageSender.MessageRecievers);
 
             await _unitOfWork.SaveAsync();
 

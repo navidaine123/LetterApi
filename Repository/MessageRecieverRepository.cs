@@ -11,7 +11,7 @@ namespace Repository
 {
     public interface IMessageRecieverRepository : IGenericRepository<MessageReciever>
     {
-        Task<bool> AddRangeAsync(ICollection<MessageReciever> messageRecievers);
+        Task<List<MessageReciever>> AddRangeAsync(List<MessageReciever> messageRecievers);
 
         Task<List<MessageReciever>> GetMessagesRecieveByAync(Guid id);
     }
@@ -30,18 +30,15 @@ namespace Repository
 
         #endregion constructors
 
-        public async Task<bool> AddRangeAsync(ICollection<MessageReciever> messageRecievers)
-        {
-            try
-            {
-                await _smContext.MessageRecievers.AddRangeAsync(messageRecievers);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+        public async Task<List<MessageReciever>> AddRangeAsync(List<MessageReciever> messageRecievers)
+        { 
+            await _smContext.MessageRecievers.AddRangeAsync(messageRecievers);
+
+            return messageRecievers;
         }
+                
+            
+        
 
         public async Task<List<MessageReciever>> GetMessagesRecieveByAync(Guid id)
             => await _smContext.MessageRecievers

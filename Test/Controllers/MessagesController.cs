@@ -35,7 +35,7 @@ namespace Test.Controllers
 
         [HttpGet]
         [Authorize]
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
             var userClaims = User.Claims;
             if (userClaims == null)
@@ -43,7 +43,7 @@ namespace Test.Controllers
 
             var creatorId = _userService.GetUSerIDFromUserClaims(userClaims);
 
-            var message = _messageServices.CreateMessage(creatorId);
+            var message =await _messageServices.CreateMessageAsync(creatorId);
 
             return Ok(message);
         }
@@ -69,7 +69,7 @@ namespace Test.Controllers
 
             var senderId = _userService.GetUSerIDFromUserClaims(User.Claims);
 
-            if (await _messageServices.MessageAction(messageDto, true, senderId))
+            if (await _messageServices.MessageAction(messageDto, false, senderId))
                 return Ok(ResponseMessage.Ok);
             return BadRequest(ResponseMessage.BadRequest);
         }
