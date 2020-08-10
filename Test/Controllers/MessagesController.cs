@@ -43,7 +43,7 @@ namespace Test.Controllers
 
             var creatorId = _userService.GetUSerIDFromUserClaims(userClaims);
 
-            var message =await _messageServices.CreateMessageAsync(creatorId);
+            var message = await _messageServices.CreateMessageAsync(creatorId);
 
             return Ok(message);
         }
@@ -81,8 +81,8 @@ namespace Test.Controllers
                 return BadRequest(ResponseMessage.NotAuthentication);
 
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
-            var a = await _messageServices.GetMessagesRecievedbyAsync(id);
-            return Ok();
+            var inboxMessages = await _messageServices.GetMessagesRecievedbyAsync(id);
+            return Ok(inboxMessages);
         }
 
         [HttpGet]

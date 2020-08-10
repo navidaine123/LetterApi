@@ -37,7 +37,7 @@ namespace Services.Shared
                    .MapFrom(src => src.MessageRecievers
                    .Where(p => p.IsCc == true).Select(x => x.UserId)));
 
-            CreateMap<MessageReciever, SendMsgDTO>();
+            CreateMap<MessageReciever, MsgBoxDTO>();
         }
     }
 }
