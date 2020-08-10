@@ -27,6 +27,10 @@ namespace Services.Shared
                 .ForMember(x => x.Id, option => option.Ignore())
                 .ForMember(x => x.CreatedBy, option => option.Ignore());
 
+            CreateMap<Message, MsgBoxDTO>()
+                .ReverseMap()
+                .ForMember(x => x.Id, option => option.Ignore());
+
             CreateMap<MessageSender, MsgBoxDTO>()
                 .ForMember
                 (x => x.To, option => option

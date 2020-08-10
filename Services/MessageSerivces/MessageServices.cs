@@ -28,6 +28,8 @@ namespace Services.MessageSerivces
         Task<List<MsgBoxDTO>> GetDeletedMessage(Guid id);
 
         Task<bool> ForwardMessageAsync(MsgBoxDTO DTO);
+
+        Task<List<MsgBoxDTO>> GetImportantSentMessages(Guid id);
     }
 
     public class MessageServices : IMessageServices
@@ -251,13 +253,18 @@ namespace Services.MessageSerivces
             return true;
         }
 
-        public async Task<List<MsgBoxDTO>> GetIamportantSentMessages(Guid id)
+        public async Task<List<MsgBoxDTO>> GetImportantSentMessages(Guid id)
         {
-            var data = await _unitOfWork.MessageRepository.GetAllSendMessagesByUserIdAsync(id);
-            
-            return data.Where(p => p.ImportanceLevel.ToString() == "Important").ToList());
+            var data = (await _messageRepository
+                .GetAllSendMessagesByUserIdAsync(id))
+                .Where(p => p.ImportanceLevel == ImportanceLevel.Important)
+                .ToList();
 
-            return null;
+            List<MsgBoxDTO> dto = new List<MsgBoxDTO>();
+
+            _mapper.Map(data, dto);
+
+            return dto;
         }
     }
 }

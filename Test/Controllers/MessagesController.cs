@@ -112,17 +112,15 @@ namespace Test.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowImportantMessaes()
+        public async Task<IActionResult> ShowImportantMessaesAsync()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
-            
-
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
-            var a = await _messageServices.GetSendOrDraftMessagesByAync(id, false);
-            return Ok(a);
+            var data = await _messageServices.GetImportantSentMessages(id);
+            return Ok(data);
         }
 
         [HttpDelete]

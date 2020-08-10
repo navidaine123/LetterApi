@@ -25,9 +25,14 @@ namespace Repository
         }
 
         public async Task<List<Message>> GetAllSendMessagesByUserIdAsync(Guid id)
-            => await _smContext.MessageSenders.Where(p => p.UserId == id).Select(s => s.Message).ToListAsync();
+            => await _smContext.MessageSenders
+            .Where(p => p.UserId == id)
+            .Select(s => s.Message)
+            .ToListAsync();
 
         public async Task<Message> GetLastOfMessagesAsync() 
-            => await _smContext.Messages.Select(x => x).FirstOrDefaultAsync();
+            => await _smContext.Messages
+            .Select(x => x)
+            .FirstOrDefaultAsync();
     }
 }
