@@ -142,7 +142,8 @@ namespace Test.Controllers
         public async Task<IActionResult> ShowDeletedMessage()
         {
             var deletedMessages =
-                await _messageServices.GetDeletedMessage(_userService.GetUSerIDFromUserClaims(User.Claims));
+                await _messageServices
+                .GetDeletedMessage(_userService.GetUSerIDFromUserClaims(User.Claims));
             if (deletedMessages != null)
                 return Ok(deletedMessages);
 
