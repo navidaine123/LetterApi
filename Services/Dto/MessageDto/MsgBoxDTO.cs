@@ -25,15 +25,17 @@ namespace Services.Dto.MessageDto
 
         public DateTime CreateOn { get; set; }
 
-        public Guid CreatedById { get; set; }
+        //public Guid CreatedById { get; set; }
 
-        public User CreatedBy { get; set; }
+        public string CreatedByName { get; set; }
 
         public string MessageNumber { get; set; }
 
         public string MessageCode { get; set; }
 
         public ImportanceLevel ImportanceLevel { get; set; }
+
+        public bool IsMarked { get; set; }
 
         public Nullable<DateTime> DueDate { get; set; }
 

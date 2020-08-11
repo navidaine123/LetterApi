@@ -30,6 +30,8 @@ namespace Services.MessageSerivces
         Task<bool> ForwardMessageAsync(MsgBoxDTO DTO);
 
         Task<List<MsgBoxDTO>> GetImportantSentMessages(Guid id);
+
+        Task<List<MsgBoxDTO>> GetMarkedMessage(Guid id);
     }
 
     public class MessageServices : IMessageServices
@@ -226,6 +228,23 @@ namespace Services.MessageSerivces
                 ((await _messageSenderRepository
                 .GetMessagesSendByAync(id))
                 .Where(x => x.DeletedDate != null));
+
+            return inboxMessages
+                .Concat(outboxMessages)
+                .ToList();
+        }
+
+        public async Task<List<MsgBoxDTO>> GetMarkedMessage(Guid id)
+        {
+            var inboxMessages = _mapper.Map<List<MsgBoxDTO>>
+                ((await _messageRecieverRepository
+                .GetMessagesRecieveByAync(id))
+                .Where(x => x.IsMarked));
+
+            var outboxMessages = _mapper.Map<List<MsgBoxDTO>>
+                ((await _messageSenderRepository
+                .GetMessagesSendByAync(id))
+                .Where(x => x.IsMarked));
 
             return inboxMessages
                 .Concat(outboxMessages)

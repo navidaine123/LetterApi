@@ -33,6 +33,10 @@ namespace Test.Controllers
 
         #endregion Contructors
 
+        /// <summary>
+        /// Create a new message and generate message number
+        /// </summary>
+        /// <returns>a new message</returns>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> CreateAsync()
@@ -48,6 +52,11 @@ namespace Test.Controllers
             return Ok(message);
         }
 
+        /// <summary>
+        /// send a message that was created
+        /// </summary>
+        /// <param name="messageDto">created message with content and subject</param>
+        /// <returns>a comment about message sending status</returns>
         [HttpPost]
         public async Task<IActionResult> SendMessage(SendMsgDTO messageDto)
         {
@@ -61,6 +70,11 @@ namespace Test.Controllers
             return BadRequest(ResponseMessage.BadRequest);
         }
 
+        /// <summary>
+        /// draft a message that was created
+        /// </summary>
+        /// <param name="messageDto">created message with content and subject</param>
+        /// <returns>a comment about message drafting status</returns>
         [HttpPost]
         public async Task<IActionResult> DraftMessage(SendMsgDTO messageDto)
         {
@@ -74,6 +88,10 @@ namespace Test.Controllers
             return BadRequest(ResponseMessage.BadRequest);
         }
 
+        /// <summary>
+        /// show messages that user recieved
+        /// </summary>
+        /// <returns>recieved messages</returns>
         [HttpGet]
         public async Task<IActionResult> ShowInbox()
         {
@@ -85,6 +103,10 @@ namespace Test.Controllers
             return Ok(inboxMessages);
         }
 
+        /// <summary>
+        /// show messages that user sent
+        /// </summary>
+        /// <returns>sent messages</returns>
         [HttpGet]
         public async Task<IActionResult> ShowOutBox()
         {
@@ -97,6 +119,10 @@ namespace Test.Controllers
             return Ok(a);
         }
 
+        /// <summary>
+        /// show messages that user draft
+        /// </summary>
+        /// <returns>drafted messages</returns>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> ShowDraftBox()
@@ -110,6 +136,10 @@ namespace Test.Controllers
             return Ok(a);
         }
 
+        /// <summary>
+        /// show messages that user recieved or sent that they are important
+        /// </summary>
+        /// <returns>important messages</returns>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> ShowImportantMessaesAsync()
@@ -123,20 +153,46 @@ namespace Test.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// show messages that user recieved or sent that user marked them
+        /// </summary>
+        /// <returns>important messages</returns>
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> ShowMarkedMessagesAsync()
+        {
+            if (User.Claims == null)
+                return BadRequest(ResponseMessage.NotAuthentication);
+
+            var id = _userService.GetUSerIDFromUserClaims(User.Claims);
+
+            var result = await _messageServices.GetMarkedMessage(id);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// delete messages that user send or draft
+        /// </summary>
+        /// <returns>delete sent or draft messages</returns>
         [HttpDelete]
         [Authorize]
         public async Task<IActionResult> DeleteFromOutboxOrDraft(MsgBoxDTO messageDto)
             => Ok(await _messageServices.DeleteSentOrDraftMessage(messageDto));
 
+        /// <summary>
+        /// delete messages that user recieved
+        /// </summary>
+        /// <returns>delete recieved messages</returns>
         [HttpDelete]
         [Authorize]
         public async Task<IActionResult> DeleteFromInbox(MsgBoxDTO messageDto)
             => Ok(await _messageServices.DeleteRecievedMessage(messageDto));
 
         /// <summary>
-        /// summary
+        /// show messages that user deletd
         /// </summary>
-        /// <returns></returns>
+        /// <returns>deleted messages</returns>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> ShowDeletedMessage()
