@@ -44,6 +44,7 @@ namespace Repository
                 var a = await _smContext.MessageRecievers
                     .Include(x => x.Message)
                     .Include(x => x.MessageSender)
+                    .Include(x=>x.ResentMessages)
                     .Where(x => x.UserId == id)
                     .ToListAsync();
 
