@@ -249,9 +249,11 @@ namespace Test.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> ForwardMessage(MsgBoxDTO dTO)
+        public async Task<IActionResult> ForwardMessage(ForwardMsgDto forwardMsgDto)
         {
-            if (await _messageServices.ForwardMessageAsync(dTO))
+            var id = _userService.GetUSerIDFromUserClaims(User.Claims);
+
+            if (await _messageServices.ForwardMessageAsync(forwardMsgDto, id))
                 return Ok("پیام ارجاع داده شد");
             return BadRequest("خطایی رخ داده است");
         }
