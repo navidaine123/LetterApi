@@ -27,7 +27,7 @@ namespace Services.MessageSerivces
 
         Task<List<MsgBoxDTO>> GetDeletedMessage(Guid id);
 
-        Task<bool> ForwardMessageAsync(MsgBoxDTO DTO);
+        Task<bool> ForwardMessageAsync(ForwardMsgDto forwardMsgDto, Guid userID);
 
         Task<List<MsgBoxDTO>> GetImportantSentMessages(Guid id);
 
@@ -262,27 +262,43 @@ namespace Services.MessageSerivces
                 .ToList();
         }
 
-        public async Task<bool> ForwardMessageAsync(MsgBoxDTO DTO)
+        public async Task<bool> ForwardMessageAsync(ForwardMsgDto forwardMsgDto, Guid userID)
         {
-            var messageSender = _mapper.Map<MessageSender>(DTO);
-            messageSender.Id = Guid.NewGuid();
-            messageSender.ResendOnId = DTO.Id;
+            var reSendOn =
+                await _messageRecieverRepository
+                .GetAsync(forwardMsgDto.MessageRecieverId);
 
-            foreach (var item in DTO.ResendToIdList)
+            var messageRecievers = new List<MessageReciever>();
+
+            var messageSender = new MessageSender
             {
-                var messageReciever = new MessageReciever
+                IsSent = true,
+                ResendOnId = forwardMsgDto.MessageRecieverId,
+                MessageId = reSendOn.MessageId,
+                Id = Guid.NewGuid(),
+                UserId = userID,
+                Prove = forwardMsgDto.Prove,
+            };
+
+            foreach (var item in forwardMsgDto.ToIds)
+            {
+                messageRecievers.Add(new MessageReciever
                 {
                     Id = Guid.NewGuid(),
-                    UserId = item,
-                    MessageId = messageSender.MessageId,
-                    MessageSenderId = messageSender.Id,
                     IsCc = false,
-                };
-                messageSender.MessageRecievers.Add(messageReciever);
+                    MessageId = reSendOn.MessageId,
+                    MessageSenderId = messageSender.Id,
+                    UserId = item,
+                });
             }
 
-            var addMessageSender = await _messageSenderRepository.AddAsync(messageSender);
-            //var addMessageReciever = await _messageRecieverRepository.AddRangeAsync(messageSender.MessageRecievers);
+            var messageSenderResult =
+                await _messageSenderRepository
+                .AddAsync(messageSender);
+
+            var messageRcieversResult =
+                await _messageRecieverRepository
+                .AddRangeAsync(messageRecievers);
 
             await _unitOfWork.SaveAsync();
 

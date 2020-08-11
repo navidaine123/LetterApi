@@ -39,14 +39,10 @@ namespace Repository
         }
 
         public async Task<ICollection<T>> GetAllAsync()
-        {
-            return await _entities.ToListAsync();
-        }
+            => await _entities.ToListAsync();
 
         public async Task<T> GetAsync(object key)
-        {
-            return await _entities.FindAsync(key);
-        }
+            => await _entities.FindAsync(key);
 
         public async Task<T> UpdateAsync(T t, object key)
         {
