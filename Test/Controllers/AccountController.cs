@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Repository;
 using Services.Dto;
+using Services.Shared;
 using Services.UserServices;
 using Test.Models.UserModels;
 
@@ -16,10 +17,12 @@ namespace Test.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IPagination<UserDto> _pagination;
 
-        public AccountController(IUserService userService)
+        public AccountController(IUserService userService, IPagination<UserDto> pagination)
         {
             _userService = userService;
+            _pagination = pagination;
         }
 
         [HttpPost]
@@ -34,9 +37,10 @@ namespace Test.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(int pageNumber, int itemsPerPage)
+        public async Task<IActionResult> GetAll(int pageNumber = 1, int itemsPerPage = 10)
         {
-            return Ok(await _userService.GetAllUsersAsync(pageNumber,itemsPerPage));
+            var users = await _userService.GetAllUsersAsync();
+            return Ok(_pagination.PagedList(users, pageNumber, itemsPerPage));
         }
     }
 }
