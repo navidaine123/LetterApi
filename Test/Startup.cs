@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Models;
 using Repository;
+using Services.Dto;
+using Services.Dto.MessageDto;
 using Services.MessageSerivces;
 using Services.Shared;
 using Services.UserServices;
@@ -64,6 +66,8 @@ namespace Test
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IMessageServices, MessageServices>();
             services.AddTransient<SmContext>();
+            services.AddTransient<IPagination<UserDto>, Pagination<UserDto>>();
+            services.AddTransient<IPagination<MsgBoxDTO>, Pagination<MsgBoxDTO>>();
 
             var mappingConfig = new MapperConfiguration(mc =>
             {
