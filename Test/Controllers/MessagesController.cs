@@ -11,6 +11,7 @@ using Models.MessageModels;
 using Newtonsoft.Json;
 using Services.Dto.MessageDto;
 using Services.MessageSerivces;
+using Services.Shared;
 using Services.UserServices;
 using Test.Models.UserModels;
 
@@ -22,13 +23,15 @@ namespace Test.Controllers
     {
         private readonly IMessageServices _messageServices;
         private readonly IUserService _userService;
+        private readonly IPagination<MsgBoxDTO> _pagination;
 
         #region Contructors
 
-        public MessagesController(IMessageServices messageServices, IUserService userService)
+        public MessagesController(IMessageServices messageServices, IUserService userService, IPagination<MsgBoxDTO> pagination)
         {
             _messageServices = messageServices;
             _userService = userService;
+            _pagination = pagination;
         }
 
         #endregion Contructors
@@ -93,14 +96,14 @@ namespace Test.Controllers
         /// </summary>
         /// <returns>recieved messages</returns>
         [HttpGet]
-        public async Task<IActionResult> ShowInbox()
+        public async Task<IActionResult> ShowInbox(int pageNumber = 1, int itemsPerPage = 10)
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
             var inboxMessages = await _messageServices.GetMessagesRecievedbyAsync(id);
-            return Ok(inboxMessages);
+            return Ok(_pagination.PagedList(inboxMessages, pageNumber, itemsPerPage));
         }
 
         /// <summary>
@@ -108,15 +111,15 @@ namespace Test.Controllers
         /// </summary>
         /// <returns>sent messages</returns>
         [HttpGet]
-        public async Task<IActionResult> ShowOutBox()
+        public async Task<IActionResult> ShowOutBox(int pageNumber = 1, int itemsPerPage = 10)
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
-            var a = await _messageServices.GetSendOrDraftMessagesByIdAync(id, true);
-            return Ok(a);
+            var outBox = await _messageServices.GetSendOrDraftMessagesByIdAync(id, true);
+            return Ok(_pagination.PagedList(outBox, pageNumber, itemsPerPage));
         }
 
         /// <summary>
@@ -125,15 +128,15 @@ namespace Test.Controllers
         /// <returns>drafted messages</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowDraftBox()
+        public async Task<IActionResult> ShowDraftBox(int pageNumber = 1, int itemsPerPage = 10)
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
-            var a = await _messageServices.GetSendOrDraftMessagesByIdAync(id, false);
-            return Ok(a);
+            var draftBox = await _messageServices.GetSendOrDraftMessagesByIdAync(id, false);
+            return Ok(_pagination.PagedList(draftBox,pageNumber,itemsPerPage));
         }
 
         /// <summary>
@@ -142,15 +145,15 @@ namespace Test.Controllers
         /// <returns>important messages</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowImportantMessaesAsync()
+        public async Task<IActionResult> ShowImportantMessaesAsync(int pageNumber = 1, int itemsPerPage = 10)
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
 
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
-            var data = await _messageServices.GetImportantSentMessages(id);
-            return Ok(data);
+            var impMsg = await _messageServices.GetImportantSentMessages(id);
+            return Ok(_pagination.PagedList(impMsg, pageNumber, itemsPerPage));
         }
 
         /// <summary>
@@ -179,7 +182,7 @@ namespace Test.Controllers
         /// <returns>true or false</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowMarkedMessagesAsync()
+        public async Task<IActionResult> ShowMarkedMessagesAsync(int pageNumber = 1, int itemsPerPage = 10)
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -188,7 +191,7 @@ namespace Test.Controllers
 
             var result = await _messageServices.GetMarkedMessage(id);
 
-            return Ok(result);
+            return Ok(_pagination.PagedList(result, pageNumber, itemsPerPage));
         }
 
         /// <summary>
@@ -224,13 +227,13 @@ namespace Test.Controllers
         /// <returns>deleted messages</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowDeletedMessage()
+        public async Task<IActionResult> ShowDeletedMessage(int pageNumber = 1, int itemsPerPage = 10)
         {
             var deletedMessages =
                 await _messageServices
                 .GetDeletedMessage(_userService.GetUSerIDFromUserClaims(User.Claims));
             if (deletedMessages != null)
-                return Ok(deletedMessages);
+                return Ok(_pagination.PagedList(deletedMessages,pageNumber, itemsPerPage));
 
             return Ok("no message has deleted");
         }

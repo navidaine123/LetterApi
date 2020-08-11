@@ -23,7 +23,7 @@ namespace Services.UserServices
 {
     public interface IUserService
     {
-        Task<ICollection<UserDto>> GetAllUsersAsync(int pageNumber, int itemsPerPage);
+        Task<ICollection<UserDto>> GetAllUsersAsync();
 
         Task<LogInResponseDto> GenerateTokenAsync(LogInDto logIn);
 
@@ -38,21 +38,18 @@ namespace Services.UserServices
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
-        private readonly IPagination<UserDto> _pagination;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration config, IPagination<UserDto> pagination)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration config)
         {
             _unitOfWork = unitOfWork;
             _userRepository = _unitOfWork.UserRepository;
             _mapper = mapper;
             _config = config;
-            _pagination = pagination;
         }
 
-        public async Task<ICollection<UserDto>> GetAllUsersAsync(int pageNumber, int itemsPerPage)
+        public async Task<ICollection<UserDto>> GetAllUsersAsync()
         {
-            List<UserDto> users = _mapper.Map<List<UserDto>>(await _userRepository.GetAllAsync());
-            return _pagination.PagedList(users, pageNumber, itemsPerPage);
+            return _mapper.Map<List<UserDto>>(await _userRepository.GetAllAsync());
         }
 
         public async Task<LogInResponseDto> GenerateTokenAsync(LogInDto logIn)
