@@ -195,10 +195,10 @@ namespace Test.Controllers
         /// delete messages that user send or draft
         /// </summary>
         /// <returns>delete sent or draft messages</returns>
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteFromOutboxOrDraft(MsgBoxDTO messageDto)
-            => Ok(await _messageServices.DeleteSentOrDraftMessage(messageDto));
+        public async Task<IActionResult> DeleteFromOutboxOrDraft(Guid id)
+            => Ok(await _messageServices.DeleteSentOrDraftMessage(id));
 
 
 
