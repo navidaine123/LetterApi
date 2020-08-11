@@ -235,6 +235,18 @@ namespace Test.Controllers
             return Ok("no message has deleted");
         }
 
+        /// <summary>
+        /// send message from draft box set issent property true
+        /// </summary>
+        /// <param name="id">message sender id</param>
+        /// <returns>send status</returns>
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> SendMessageFromDraftBoxAsync(Guid id)
+        {
+            return Ok(await _messageServices.SendFromDraftAsync(id));
+        }
+
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> ForwardMessage(MsgBoxDTO dTO)
