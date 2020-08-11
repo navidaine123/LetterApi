@@ -201,12 +201,12 @@ namespace Test.Controllers
             => Ok(await _messageServices.DeleteSentOrDraftMessage(messageDto));
 
 
-        [HttpDelete("{id}")]
+
         /// <summary>
         /// delete messages that user recieved
         /// </summary>
         /// <returns>delete recieved messages</returns>
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteFromInbox(Guid id)
             => Ok(await _messageServices.DeleteRecievedMessage(id));
