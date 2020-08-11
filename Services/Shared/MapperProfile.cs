@@ -47,6 +47,7 @@ namespace Services.Shared
 
             CreateMap<MessageReciever, MsgBoxDTO>();
 
+
         }
     }
 }
