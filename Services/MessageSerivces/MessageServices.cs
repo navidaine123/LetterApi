@@ -38,6 +38,8 @@ namespace Services.MessageSerivces
         Task<bool> SetMarkSentMessageAsync(Guid id);
 
         Task<string> RestoreDeletedMessageAsync(Guid id);
+
+        Task<string> SendFromDraftAsync(Guid id);
     }
 
     public class MessageServices : IMessageServices
@@ -368,6 +370,23 @@ namespace Services.MessageSerivces
 
                 return "پیام بازگردانده شد";
             }
+        }
+
+        public async Task<string> SendFromDraftAsync(Guid id)
+        {
+            var message =
+                await _messageSenderRepository
+                .GetAsync(id);
+
+            message.IsSent = true;
+
+            message =
+                await _messageSenderRepository
+                .UpdateAsync(message, id);
+
+            await _unitOfWork.SaveAsync();
+
+            return "پیام ارسال شد";
         }
     }
 }
