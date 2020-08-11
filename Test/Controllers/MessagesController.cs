@@ -200,8 +200,6 @@ namespace Test.Controllers
         public async Task<IActionResult> DeleteFromOutboxOrDraft(MsgBoxDTO messageDto)
             => Ok(await _messageServices.DeleteSentOrDraftMessage(messageDto));
 
-
-
         /// <summary>
         /// delete messages that user recieved
         /// </summary>
@@ -210,6 +208,15 @@ namespace Test.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteFromInbox(Guid id)
             => Ok(await _messageServices.DeleteRecievedMessage(id));
+
+        /// <summary>
+        /// restore deleted message
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> RestoreDeletedMessageAsync(Guid id)
+            => Ok(await _messageServices.RestoreDeletedMessageAsync(id));
 
         /// <summary>
         /// show messages that user deletd

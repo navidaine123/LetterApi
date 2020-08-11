@@ -36,6 +36,8 @@ namespace Services.MessageSerivces
         Task<bool> SetMarkRecievedMessageAsync(Guid id);
 
         Task<bool> SetMarkSentMessageAsync(Guid id);
+
+        Task<string> RestoreDeletedMessageAsync(Guid id);
     }
 
     public class MessageServices : IMessageServices
@@ -325,6 +327,36 @@ namespace Services.MessageSerivces
                 .UpdateAsync(message, id);
 
             return message.IsMarked;
+        }
+
+        public async Task<string> RestoreDeletedMessageAsync(Guid id)
+        {
+            if (await _messageRecieverRepository.GetAsync(id) != null)
+            {
+                var message =
+                    await _messageRecieverRepository
+                    .GetAsync(id);
+
+                message =
+                    await _messageRecieverRepository
+                    .UpdateAsync(message, id);
+
+                await _unitOfWork.SaveAsync();
+                return "پیام بازگردانده شد";
+            }
+            else
+            {
+                var message =
+                    await _messageSenderRepository
+                    .GetAsync(id);
+
+                message =
+                    await _messageSenderRepository
+                    .UpdateAsync(message, id);
+
+                await _unitOfWork.SaveAsync();
+                return "پیام بازگردانده شد";
+            }
         }
     }
 }
