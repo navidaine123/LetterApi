@@ -33,14 +33,10 @@ namespace Test.Controllers
             return Ok("عملیات با موفقیت انجام شد");
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAll()
-        //{
-        //    var calims = User.Claims.ToList();
-        //    var data = await _userService.GetAllUsersAsync();
-        //    var result = _userService
-
-        //    return Ok(await _userService.GetAllUsersAsync());
-        //}
+        [HttpGet]
+        public async Task<IActionResult> GetAll(int pageNumber, int itemsPerPage)
+        {
+            return Ok(await _userService.GetAllUsersAsync(pageNumber,itemsPerPage));
+        }
     }
 }

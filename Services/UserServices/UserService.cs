@@ -23,7 +23,7 @@ namespace Services.UserServices
 {
     public interface IUserService
     {
-        Task<ICollection<UserDto>> GetAllUsersAsync();
+        Task<ICollection<UserDto>> GetAllUsersAsync(int pageNumber, int itemsPerPage);
 
         Task<LogInResponseDto> GenerateTokenAsync(LogInDto logIn);
 
@@ -49,9 +49,10 @@ namespace Services.UserServices
             _pagination = pagination;
         }
 
-        public async Task<ICollection<UserDto>> GetAllUsersAsync()
+        public async Task<ICollection<UserDto>> GetAllUsersAsync(int pageNumber, int itemsPerPage)
         {
-            return _mapper.Map<List<UserDto>>(await _userRepository.GetAllAsync());
+            List<UserDto> users = _mapper.Map<List<UserDto>>(await _userRepository.GetAllAsync());
+            return _pagination.PagedList(users, pageNumber, itemsPerPage);
         }
 
         public async Task<LogInResponseDto> GenerateTokenAsync(LogInDto logIn)
