@@ -34,13 +34,9 @@ namespace Test.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(int pageNumber, int itemsPerPage)
         {
-            var calims = User.Claims.ToList();
-            var data = await _userService.GetAllUsersAsync();
-            var result = _userService
-
-            return Ok(await _userService.GetAllUsersAsync());
+            return Ok(await _userService.GetAllUsersAsync(pageNumber,itemsPerPage));
         }
     }
 }
