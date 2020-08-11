@@ -247,9 +247,14 @@ namespace Test.Controllers
             return Ok(await _messageServices.SendFromDraftAsync(id));
         }
 
+        /// <summary>
+        /// give forwMsgDto to it and forward message
+        /// </summary>
+        /// <param name="forwardMsgDto">prove is external content toid is contact that you want forward to them </param>
+        /// <returns>message status</returns>
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> ForwardMessage(ForwardMsgDto forwardMsgDto)
+        public async Task<IActionResult> ForwardMessageAsync(ForwardMsgDto forwardMsgDto)
         {
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
