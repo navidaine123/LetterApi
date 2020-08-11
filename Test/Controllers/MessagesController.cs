@@ -154,9 +154,29 @@ namespace Test.Controllers
         }
 
         /// <summary>
-        /// show messages that user recieved or sent that user marked them
+        /// set message ismarked value true
         /// </summary>
-        /// <returns>important messages</returns>
+        /// <returns>true or false</returns>
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> SetMarkRcievedMessagesAsync(Guid id)
+            => Ok(await _messageServices.SetMarkRecievedMessageAsync(id));
+
+        /// <summary>
+        /// if sent message not marked set message ismarked value true
+        /// else unmarked message and set ismarked value false
+        /// </summary>
+        /// <returns>true or false</returns>
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> SetMarkSentMessagesAsync(Guid id)
+            => Ok(await _messageServices.SetMarkRecievedMessageAsync(id));
+
+        /// <summary>
+        /// if recieved message not marked set message ismarked value true
+        /// else unmarked message and set ismarked value false
+        /// </summary>
+        /// <returns>true or false</returns>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> ShowMarkedMessagesAsync()

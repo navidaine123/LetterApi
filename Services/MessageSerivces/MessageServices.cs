@@ -32,6 +32,10 @@ namespace Services.MessageSerivces
         Task<List<MsgBoxDTO>> GetImportantSentMessages(Guid id);
 
         Task<List<MsgBoxDTO>> GetMarkedMessage(Guid id);
+
+        Task<bool> SetMarkRecievedMessageAsync(Guid id);
+
+        Task<bool> SetMarkSentMessageAsync(Guid id);
     }
 
     public class MessageServices : IMessageServices
@@ -284,5 +288,41 @@ namespace Services.MessageSerivces
             .ToList()
             .Where(p => p.ImportanceLevel == ImportanceLevel.Important)
             .ToList();
+
+        public async Task<bool> SetMarkRecievedMessageAsync(Guid id)
+        {
+            var message =
+                await _messageRecieverRepository
+                .GetAsync(id);
+
+            if (message.IsMarked)
+                message.IsMarked = false;
+            else
+                message.IsMarked = true;
+
+            message =
+                await _messageRecieverRepository
+                .UpdateAsync(message, id);
+
+            return message.IsMarked;
+        }
+
+        public async Task<bool> SetMarkSentMessageAsync(Guid id)
+        {
+            var message =
+                await _messageSenderRepository
+                .GetAsync(id);
+
+            if (message.IsMarked)
+                message.IsMarked = false;
+            else
+                message.IsMarked = true;
+
+            message =
+                await _messageSenderRepository
+                .UpdateAsync(message, id);
+
+            return message.IsMarked;
+        }
     }
 }

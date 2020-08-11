@@ -107,7 +107,7 @@ namespace Services.UserServices
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 SigningCredentials = credentials,
-                Expires = DateTime.UtcNow.AddMinutes(40),
+                Expires = DateTime.UtcNow.AddDays(1),
                 NotBefore = DateTime.UtcNow,
                 Subject = new ClaimsIdentity(claims)
             };
