@@ -19,6 +19,8 @@ namespace Repository
         Task<T> UpdateAsync(T t, object key);
 
         T Delete(T t);
+
+        
     }
 
     public class GenericRepository<T> : IGenericRepository<T> where T : class
@@ -63,5 +65,8 @@ namespace Repository
             _entities.Remove(t);
             return t;
         }
+
+        
+
     }
 }

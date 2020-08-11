@@ -213,7 +213,7 @@ namespace Test.Controllers
         /// restore deleted message
         /// </summary>
         /// <returns></returns>
-        [HttpPut("{id}")]
+        [HttpPut]
         [Authorize]
         public async Task<IActionResult> RestoreDeletedMessageAsync(Guid id)
             => Ok(await _messageServices.RestoreDeletedMessageAsync(id));

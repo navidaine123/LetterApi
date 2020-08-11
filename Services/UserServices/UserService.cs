@@ -38,13 +38,15 @@ namespace Services.UserServices
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
+        private readonly IPagination<UserDto> _pagination;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration config)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration config, IPagination<UserDto> pagination)
         {
             _unitOfWork = unitOfWork;
             _userRepository = _unitOfWork.UserRepository;
             _mapper = mapper;
             _config = config;
+            _pagination = pagination;
         }
 
         public async Task<ICollection<UserDto>> GetAllUsersAsync()
@@ -146,5 +148,7 @@ namespace Services.UserServices
             Guid.Parse(claims
                 .FirstOrDefault(p => p.Type.Equals(ClaimTypes.NameIdentifier))
                 .Value);
+
+        
     }
 }
