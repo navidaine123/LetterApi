@@ -309,6 +309,8 @@ namespace Services.MessageSerivces
                 await _messageRecieverRepository
                 .UpdateAsync(message, id);
 
+            await _unitOfWork.SaveAsync();
+
             return message.IsMarked;
         }
 
@@ -327,6 +329,8 @@ namespace Services.MessageSerivces
                 await _messageSenderRepository
                 .UpdateAsync(message, id);
 
+            await _unitOfWork.SaveAsync();
+
             return message.IsMarked;
         }
 
@@ -343,6 +347,7 @@ namespace Services.MessageSerivces
                     .UpdateAsync(message, id);
 
                 await _unitOfWork.SaveAsync();
+
                 return "پیام بازگردانده شد";
             }
             else
@@ -356,6 +361,7 @@ namespace Services.MessageSerivces
                     .UpdateAsync(message, id);
 
                 await _unitOfWork.SaveAsync();
+
                 return "پیام بازگردانده شد";
             }
         }
