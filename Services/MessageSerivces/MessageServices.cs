@@ -342,6 +342,8 @@ namespace Services.MessageSerivces
                     await _messageRecieverRepository
                     .GetAsync(id);
 
+                message.DeletedDate = null;
+
                 message =
                     await _messageRecieverRepository
                     .UpdateAsync(message, id);
@@ -355,6 +357,8 @@ namespace Services.MessageSerivces
                 var message =
                     await _messageSenderRepository
                     .GetAsync(id);
+
+                message.DeletedDate = null;
 
                 message =
                     await _messageSenderRepository
