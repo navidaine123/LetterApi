@@ -30,6 +30,12 @@ namespace Services.MessageSerivces
         Task<bool> ForwardMessageAsync(MsgBoxDTO DTO);
 
         Task<List<MsgBoxDTO>> GetImportantSentMessages(Guid id);
+
+        Task<List<MsgBoxDTO>> GetMarkedMessage(Guid id);
+
+        Task<bool> SetMarkRecievedMessageAsync(Guid id);
+
+        Task<bool> SetMarkSentMessageAsync(Guid id);
     }
 
     public class MessageServices : IMessageServices
@@ -234,6 +240,23 @@ namespace Services.MessageSerivces
                 .ToList();
         }
 
+        public async Task<List<MsgBoxDTO>> GetMarkedMessage(Guid id)
+        {
+            var inboxMessages = _mapper.Map<List<MsgBoxDTO>>
+                ((await _messageRecieverRepository
+                .GetMessagesRecieveByAync(id))
+                .Where(x => x.IsMarked));
+
+            var outboxMessages = _mapper.Map<List<MsgBoxDTO>>
+                ((await _messageSenderRepository
+                .GetMessagesSendByAync(id))
+                .Where(x => x.IsMarked));
+
+            return inboxMessages
+                .Concat(outboxMessages)
+                .ToList();
+        }
+
         public async Task<bool> ForwardMessageAsync(MsgBoxDTO DTO)
         {
             var messageSender = _mapper.Map<MessageSender>(DTO);
@@ -267,5 +290,41 @@ namespace Services.MessageSerivces
             .ToList()
             .Where(p => p.ImportanceLevel == ImportanceLevel.Important)
             .ToList();
+
+        public async Task<bool> SetMarkRecievedMessageAsync(Guid id)
+        {
+            var message =
+                await _messageRecieverRepository
+                .GetAsync(id);
+
+            if (message.IsMarked)
+                message.IsMarked = false;
+            else
+                message.IsMarked = true;
+
+            message =
+                await _messageRecieverRepository
+                .UpdateAsync(message, id);
+
+            return message.IsMarked;
+        }
+
+        public async Task<bool> SetMarkSentMessageAsync(Guid id)
+        {
+            var message =
+                await _messageSenderRepository
+                .GetAsync(id);
+
+            if (message.IsMarked)
+                message.IsMarked = false;
+            else
+                message.IsMarked = true;
+
+            message =
+                await _messageSenderRepository
+                .UpdateAsync(message, id);
+
+            return message.IsMarked;
+        }
     }
 }

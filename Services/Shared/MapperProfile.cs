@@ -46,8 +46,6 @@ namespace Services.Shared
                 .MapFrom(src => src.Message.DueDate));
 
             CreateMap<MessageReciever, MsgBoxDTO>();
-
-
         }
     }
 }
