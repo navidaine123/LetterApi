@@ -17,12 +17,10 @@ namespace Test.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IPagination<UserDto> _pagination;
 
-        public AccountController(IUserService userService, IPagination<UserDto> pagination)
+        public AccountController(IUserService userService)
         {
             _userService = userService;
-            _pagination = pagination;
         }
 
         [HttpPost]
@@ -40,7 +38,9 @@ namespace Test.Controllers
         public async Task<IActionResult> GetAll(int pageNumber = 1, int itemsPerPage = 10)
         {
             var users = await _userService.GetAllUsersAsync();
-            return Ok(_pagination.PagedList(users, pageNumber, itemsPerPage));
+            //return Ok(_pagination.PagedList(users, pageNumber, itemsPerPage));
+            var data = new PaginationDto<UserDto>(users, pageNumber, itemsPerPage);
+            return Ok(data);
         }
     }
 }

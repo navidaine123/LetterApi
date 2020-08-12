@@ -66,8 +66,6 @@ namespace Test
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IMessageServices, MessageServices>();
             services.AddTransient<SmContext>();
-            services.AddTransient<IPagination<UserDto>, Pagination<UserDto>>();
-            services.AddTransient<IPagination<MsgBoxDTO>, Pagination<MsgBoxDTO>>();
 
             var mappingConfig = new MapperConfiguration(mc =>
             {
