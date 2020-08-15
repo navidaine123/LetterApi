@@ -23,15 +23,13 @@ namespace Test.Controllers
     {
         private readonly IMessageServices _messageServices;
         private readonly IUserService _userService;
-        private readonly IPagination<MsgBoxDTO> _pagination;
 
         #region Contructors
 
-        public MessagesController(IMessageServices messageServices, IUserService userService, IPagination<MsgBoxDTO> pagination)
+        public MessagesController(IMessageServices messageServices, IUserService userService)
         {
             _messageServices = messageServices;
             _userService = userService;
-            _pagination = pagination;
         }
 
         #endregion Contructors
@@ -103,7 +101,8 @@ namespace Test.Controllers
 
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
             var inboxMessages = await _messageServices.GetMessagesRecievedbyAsync(id);
-            return Ok(PaginatedList<MsgBoxDTO>.CreateAsync());
+
+            return Ok(new PaginationDto<MsgBoxDTO>(inboxMessages, pageNumber, itemsPerPage));
         }
 
         /// <summary>
@@ -119,7 +118,7 @@ namespace Test.Controllers
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var outBox = await _messageServices.GetSendOrDraftMessagesByIdAync(id, true);
-            return Ok(_pagination.PagedList(outBox, pageNumber, itemsPerPage));
+            return Ok(new PaginationDto<MsgBoxDTO>(outBox, pageNumber, itemsPerPage));
         }
 
         /// <summary>
@@ -136,7 +135,7 @@ namespace Test.Controllers
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var draftBox = await _messageServices.GetSendOrDraftMessagesByIdAync(id, false);
-            return Ok(_pagination.PagedList(draftBox, pageNumber, itemsPerPage));
+            return Ok(new PaginationDto<MsgBoxDTO>(draftBox, pageNumber, itemsPerPage));
         }
 
         /// <summary>
@@ -153,7 +152,7 @@ namespace Test.Controllers
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var impMsg = await _messageServices.GetImportantSentMessages(id);
-            return Ok(_pagination.PagedList(impMsg, pageNumber, itemsPerPage));
+            return Ok(new PaginationDto<MsgBoxDTO>(impMsg, pageNumber, itemsPerPage));
         }
 
         /// <summary>
@@ -191,7 +190,7 @@ namespace Test.Controllers
 
             var result = await _messageServices.GetMarkedMessage(id);
 
-            return Ok(_pagination.PagedList(result, pageNumber, itemsPerPage));
+            return Ok(new PaginationDto<MsgBoxDTO>(result, pageNumber, itemsPerPage));
         }
 
         /// <summary>
@@ -233,7 +232,7 @@ namespace Test.Controllers
                 await _messageServices
                 .GetDeletedMessage(_userService.GetUSerIDFromUserClaims(User.Claims));
             if (deletedMessages != null)
-                return Ok(_pagination.PagedList(deletedMessages, pageNumber, itemsPerPage));
+                return Ok(new PaginationDto<MsgBoxDTO>(deletedMessages, pageNumber, itemsPerPage));
 
             return Ok("no message has deleted");
         }
