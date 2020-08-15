@@ -103,7 +103,7 @@ namespace Test.Controllers
 
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
             var inboxMessages = await _messageServices.GetMessagesRecievedbyAsync(id);
-            return Ok(_pagination.PagedList(inboxMessages, pageNumber, itemsPerPage));
+            return Ok(PaginatedList<MsgBoxDTO>.CreateAsync());
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace Test.Controllers
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var draftBox = await _messageServices.GetSendOrDraftMessagesByIdAync(id, false);
-            return Ok(_pagination.PagedList(draftBox,pageNumber,itemsPerPage));
+            return Ok(_pagination.PagedList(draftBox, pageNumber, itemsPerPage));
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace Test.Controllers
                 await _messageServices
                 .GetDeletedMessage(_userService.GetUSerIDFromUserClaims(User.Claims));
             if (deletedMessages != null)
-                return Ok(_pagination.PagedList(deletedMessages,pageNumber, itemsPerPage));
+                return Ok(_pagination.PagedList(deletedMessages, pageNumber, itemsPerPage));
 
             return Ok("no message has deleted");
         }
