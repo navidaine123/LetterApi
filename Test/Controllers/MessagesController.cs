@@ -59,7 +59,7 @@ namespace Test.Controllers
         /// <param name="messageDto">created message with content and subject</param>
         /// <returns>a comment about message sending status</returns>
         [HttpPost]
-        public async Task<IActionResult> SendMessage(SendMsgDTO messageDto)
+        public async Task<IActionResult> SendMessageAsync(SendMsgDTO messageDto)
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -77,7 +77,7 @@ namespace Test.Controllers
         /// <param name="messageDto">created message with content and subject</param>
         /// <returns>a comment about message drafting status</returns>
         [HttpPost]
-        public async Task<IActionResult> DraftMessage(SendMsgDTO messageDto)
+        public async Task<IActionResult> DraftMessageAsync(SendMsgDTO messageDto)
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -94,7 +94,7 @@ namespace Test.Controllers
         /// </summary>
         /// <returns>recieved messages</returns>
         [HttpGet]
-        public async Task<IActionResult> ShowInbox(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowInboxAsync(int pageNumber = 1, int itemsPerPage = 10)
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -110,7 +110,7 @@ namespace Test.Controllers
         /// </summary>
         /// <returns>sent messages</returns>
         [HttpGet]
-        public async Task<IActionResult> ShowOutBox(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowOutBoxAsync(int pageNumber = 1, int itemsPerPage = 10)
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -127,7 +127,7 @@ namespace Test.Controllers
         /// <returns>drafted messages</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowDraftBox(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowDraftBoxAsync(int pageNumber = 1, int itemsPerPage = 10)
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -199,7 +199,7 @@ namespace Test.Controllers
         /// <returns>delete sent or draft messages</returns>
         [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteFromOutboxOrDraft(Guid id)
+        public async Task<IActionResult> DeleteFromOutboxOrDraftAsync(Guid id)
             => Ok(await _messageServices.DeleteSentOrDraftMessage(id));
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace Test.Controllers
         /// <returns>delete recieved messages</returns>
         [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteFromInbox(Guid id)
+        public async Task<IActionResult> DeleteFromInboxAsync(Guid id)
             => Ok(await _messageServices.DeleteRecievedMessage(id));
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace Test.Controllers
         /// <returns>deleted messages</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowDeletedMessage(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowDeletedMessageAsync(int pageNumber = 1, int itemsPerPage = 10)
         {
             var deletedMessages =
                 await _messageServices
@@ -264,5 +264,9 @@ namespace Test.Controllers
                 return Ok("پیام ارجاع داده شد");
             return BadRequest("خطایی رخ داده است");
         }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ReplyMessageAsync()
     }
 }
