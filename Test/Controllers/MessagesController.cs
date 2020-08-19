@@ -94,7 +94,7 @@ namespace Test.Controllers
         /// </summary>
         /// <returns>recieved messages</returns>
         [HttpGet]
-        public async Task<IActionResult> ShowInbox(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowInbox()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -110,7 +110,7 @@ namespace Test.Controllers
         /// </summary>
         /// <returns>sent messages</returns>
         [HttpGet]
-        public async Task<IActionResult> ShowOutBox(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowOutBox()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -127,7 +127,7 @@ namespace Test.Controllers
         /// <returns>drafted messages</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowDraftBox(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowDraftBox()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -144,7 +144,7 @@ namespace Test.Controllers
         /// <returns>important messages</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowImportantMessaesAsync(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowImportantMessaesAsync()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -181,7 +181,7 @@ namespace Test.Controllers
         /// <returns>true or false</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowMarkedMessagesAsync(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowMarkedMessagesAsync()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -226,7 +226,7 @@ namespace Test.Controllers
         /// <returns>deleted messages</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowDeletedMessage(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowDeletedMessage()
         {
             var deletedMessages =
                 await _messageServices
