@@ -94,8 +94,7 @@ namespace Test.Controllers
         /// </summary>
         /// <returns>recieved messages</returns>
         [HttpGet]
-        public async Task<IActionResult> ShowInboxAsync(int pageNumber = 1, int itemsPerPage = 10)
-        public async Task<IActionResult> ShowInbox()
+        public async Task<IActionResult> ShowInboxAsync()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -111,8 +110,7 @@ namespace Test.Controllers
         /// </summary>
         /// <returns>sent messages</returns>
         [HttpGet]
-        public async Task<IActionResult> ShowOutBoxAsync(int pageNumber = 1, int itemsPerPage = 10)
-        public async Task<IActionResult> ShowOutBox()
+        public async Task<IActionResult> ShowOutBoxAsync()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -270,5 +268,8 @@ namespace Test.Controllers
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> ReplyMessageAsync()
+        {
+            return Ok();
+        }
     }
 }
