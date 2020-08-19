@@ -49,6 +49,12 @@ namespace Models
 
             modelBuilder.ApplyConfiguration(new MessageRecieverMapping());
             modelBuilder.ApplyConfiguration(new MessageSenderMapping());
+            modelBuilder
+                .Entity<MessageSender>()
+                .HasOne(x => x.ReplyTo)
+                .WithMany(x => x.ReplyFrom)
+                .HasForeignKey(x => x.ReplyToId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             #endregion Mapping
         }

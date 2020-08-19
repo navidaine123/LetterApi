@@ -35,8 +35,7 @@ namespace Models.MessageModels
 
         public Message Message { get; set; }
 
-        [ForeignKey("ReplyTo")]
-        public Guid ReplyToId { get; set; }
+        public Nullable<Guid> ReplyToId { get; set; }
 
         public MessageReciever ReplyTo { get; set; }
     }

@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Models;
 
 namespace Models.Migrations
 {
     [DbContext(typeof(SmContext))]
-    partial class SmContextModelSnapshot : ModelSnapshot
+    [Migration("20200819115400_replyToInMessageSenderRelationWithReciever")]
+    partial class replyToInMessageSenderRelationWithReciever
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,7 +115,7 @@ namespace Models.Migrations
                     b.Property<string>("Prove")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
-                    b.Property<Guid?>("ReplyToId")
+                    b.Property<Guid>("ReplyToId")
                         .HasColumnType("char(36)");
 
                     b.Property<Guid?>("ResendOnId")
@@ -213,8 +215,8 @@ namespace Models.Migrations
                             LockoutEnd = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Mobile = "09361060437",
                             NationalCode = "98",
-                            PasswordHash = new byte[] { 251, 146, 100, 49, 96, 32, 33, 123, 210, 144, 117, 243, 211, 230, 244, 154, 205, 242, 143, 107, 44, 220, 16, 189, 46, 67, 231, 57, 100, 205, 226, 153, 140, 16, 185, 199, 248, 167, 121, 129, 36, 38, 29, 141, 37, 129, 190, 144, 217, 81, 130, 83, 230, 231, 177, 67, 180, 29, 6, 231, 137, 1, 206, 103 },
-                            PasswordSalt = new byte[] { 200, 170, 134, 129, 3, 205, 251, 177, 21, 216, 177, 32, 119, 125, 68, 132, 173, 232, 75, 69, 122, 222, 211, 53, 0, 124, 192, 251, 38, 133, 105, 195, 175, 139, 70, 94, 15, 195, 39, 100, 218, 24, 104, 16, 13, 162, 90, 76, 76, 48, 177, 74, 185, 205, 217, 81, 147, 213, 25, 221, 204, 154, 101, 48, 128, 207, 68, 116, 42, 247, 171, 23, 218, 107, 186, 29, 156, 247, 166, 13, 143, 181, 144, 33, 107, 96, 1, 3, 214, 107, 108, 159, 74, 155, 101, 105, 139, 206, 116, 205, 199, 131, 178, 14, 92, 126, 169, 180, 34, 112, 134, 123, 236, 148, 163, 217, 83, 234, 233, 157, 111, 169, 13, 82, 8, 50, 173, 220 },
+                            PasswordHash = new byte[] { 218, 118, 122, 165, 150, 3, 200, 58, 212, 176, 252, 104, 221, 201, 55, 175, 89, 240, 134, 122, 239, 183, 190, 174, 102, 25, 213, 254, 115, 122, 21, 194, 16, 126, 215, 174, 72, 64, 249, 208, 244, 23, 9, 54, 231, 30, 111, 118, 213, 190, 37, 151, 103, 12, 177, 221, 225, 140, 103, 172, 92, 25, 198, 65 },
+                            PasswordSalt = new byte[] { 23, 137, 97, 235, 131, 137, 195, 247, 187, 209, 100, 185, 129, 249, 87, 134, 66, 194, 41, 93, 100, 202, 56, 78, 92, 119, 206, 171, 7, 212, 155, 166, 56, 52, 201, 73, 57, 188, 41, 27, 74, 116, 16, 192, 53, 243, 38, 187, 85, 63, 81, 47, 254, 31, 17, 216, 242, 63, 165, 78, 143, 189, 107, 162, 68, 164, 207, 111, 184, 226, 138, 66, 160, 192, 126, 42, 110, 50, 44, 188, 75, 116, 102, 149, 13, 169, 90, 51, 161, 121, 148, 232, 206, 142, 74, 206, 30, 157, 119, 45, 169, 150, 38, 132, 61, 10, 72, 101, 202, 154, 182, 145, 3, 166, 115, 9, 73, 18, 32, 122, 15, 21, 219, 252, 254, 215, 182, 61 },
                             UserName = "navid"
                         });
                 });
@@ -239,7 +241,7 @@ namespace Models.Migrations
                     b.HasOne("Models.MessageModels.MessageSender", "MessageSender")
                         .WithMany("MessageRecievers")
                         .HasForeignKey("MessageSenderId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Test.Models.UserModels.User", "User")
@@ -260,7 +262,8 @@ namespace Models.Migrations
                     b.HasOne("Models.MessageModels.MessageReciever", "ReplyTo")
                         .WithMany("ReplyFrom")
                         .HasForeignKey("ReplyToId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Models.MessageModels.MessageReciever", "ResendOn")
                         .WithMany("ResentMessages")

@@ -16,7 +16,7 @@ namespace Models.MessageModels
 
         public bool IsCc { get; set; }
 
-        public DateTime? DeletedDate { get; set; }
+        public Nullable<DateTime> DeletedDate { get; set; }
 
         public bool IsMarked { get; set; }
 
@@ -30,11 +30,12 @@ namespace Models.MessageModels
 
         public Message Message { get; set; }
 
-        [ForeignKey("MessageSender")]
         public Guid MessageSenderId { get; set; }
 
         public MessageSender MessageSender { get; set; }
 
         public virtual ICollection<MessageSender> ResentMessages { get; set; }
+
+        public List<MessageSender> ReplyFrom { get; set; }
     }
 }

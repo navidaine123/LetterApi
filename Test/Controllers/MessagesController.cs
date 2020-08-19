@@ -265,11 +265,23 @@ namespace Test.Controllers
             return BadRequest("خطایی رخ داده است");
         }
 
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> CreateReplyMessageAsync(Guid replyToMessageRecieverId)
+        {
+            var senderId = _userService.GetUSerIDFromUserClaims(User.Claims);
+
+            return Ok(await _messageServices.CreateReplyMessageAsync(senderId, replyToMessageRecieverId));
+        }
+
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> ReplyMessageAsync()
+        public async Task<IActionResult> ReplyMessageAsync(ReplyMessageDTO replyMessageDTO)
         {
-            return Ok();
+            if (await _messageServices.ReplyMessageAsync(replyMessageDTO))
+                return Ok("حله");
+
+            return BadRequest("نشد");
         }
     }
 }

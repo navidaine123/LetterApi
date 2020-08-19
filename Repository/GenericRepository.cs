@@ -19,8 +19,6 @@ namespace Repository
         Task<T> UpdateAsync(T t, object key);
 
         T Delete(T t);
-
-        
     }
 
     public class GenericRepository<T> : IGenericRepository<T> where T : class
@@ -43,7 +41,7 @@ namespace Repository
         public async Task<ICollection<T>> GetAllAsync()
             => await _entities.ToListAsync();
 
-        public async Task<T> GetAsync(object key)
+        public virtual async Task<T> GetAsync(object key)
             => await _entities.FindAsync(key);
 
         public async Task<T> UpdateAsync(T t, object key)
@@ -65,8 +63,5 @@ namespace Repository
             _entities.Remove(t);
             return t;
         }
-
-        
-
     }
 }

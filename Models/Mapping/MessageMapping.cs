@@ -15,7 +15,8 @@ namespace Models.Mapping
             builder
                 .HasMany(p => p.MessageRecievers)
                 .WithOne(p => p.MessageSender)
-                .HasForeignKey(p => p.MessageSenderId);
+                .HasForeignKey(p => p.MessageSenderId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 

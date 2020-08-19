@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Models;
 
 namespace Models.Migrations
 {
     [DbContext(typeof(SmContext))]
-    partial class SmContextModelSnapshot : ModelSnapshot
+    [Migration("20200819121200_replyToInMessageSenderRelationWithReciever2")]
+    partial class replyToInMessageSenderRelationWithReciever2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -213,8 +215,8 @@ namespace Models.Migrations
                             LockoutEnd = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Mobile = "09361060437",
                             NationalCode = "98",
-                            PasswordHash = new byte[] { 251, 146, 100, 49, 96, 32, 33, 123, 210, 144, 117, 243, 211, 230, 244, 154, 205, 242, 143, 107, 44, 220, 16, 189, 46, 67, 231, 57, 100, 205, 226, 153, 140, 16, 185, 199, 248, 167, 121, 129, 36, 38, 29, 141, 37, 129, 190, 144, 217, 81, 130, 83, 230, 231, 177, 67, 180, 29, 6, 231, 137, 1, 206, 103 },
-                            PasswordSalt = new byte[] { 200, 170, 134, 129, 3, 205, 251, 177, 21, 216, 177, 32, 119, 125, 68, 132, 173, 232, 75, 69, 122, 222, 211, 53, 0, 124, 192, 251, 38, 133, 105, 195, 175, 139, 70, 94, 15, 195, 39, 100, 218, 24, 104, 16, 13, 162, 90, 76, 76, 48, 177, 74, 185, 205, 217, 81, 147, 213, 25, 221, 204, 154, 101, 48, 128, 207, 68, 116, 42, 247, 171, 23, 218, 107, 186, 29, 156, 247, 166, 13, 143, 181, 144, 33, 107, 96, 1, 3, 214, 107, 108, 159, 74, 155, 101, 105, 139, 206, 116, 205, 199, 131, 178, 14, 92, 126, 169, 180, 34, 112, 134, 123, 236, 148, 163, 217, 83, 234, 233, 157, 111, 169, 13, 82, 8, 50, 173, 220 },
+                            PasswordHash = new byte[] { 103, 227, 196, 169, 231, 1, 69, 71, 105, 168, 95, 242, 181, 229, 124, 120, 102, 160, 198, 58, 162, 52, 130, 198, 210, 14, 111, 203, 12, 245, 23, 98, 253, 143, 39, 164, 246, 161, 142, 252, 184, 46, 75, 2, 46, 53, 21, 105, 11, 111, 25, 166, 146, 210, 42, 250, 5, 77, 165, 234, 148, 18, 229, 229 },
+                            PasswordSalt = new byte[] { 70, 50, 170, 244, 173, 36, 172, 64, 228, 132, 122, 79, 171, 36, 32, 27, 97, 235, 197, 69, 98, 228, 57, 105, 197, 119, 240, 131, 4, 189, 239, 195, 201, 197, 22, 190, 208, 15, 89, 93, 243, 106, 213, 198, 94, 23, 144, 8, 253, 11, 248, 133, 114, 17, 131, 159, 93, 247, 129, 238, 184, 48, 128, 91, 112, 74, 145, 201, 209, 97, 131, 112, 243, 18, 147, 224, 234, 10, 50, 16, 136, 205, 225, 1, 64, 8, 219, 116, 113, 101, 51, 62, 48, 98, 127, 21, 106, 205, 61, 124, 134, 119, 31, 143, 186, 202, 101, 21, 237, 62, 240, 227, 206, 47, 67, 6, 208, 252, 234, 145, 48, 105, 97, 29, 81, 190, 53, 147 },
                             UserName = "navid"
                         });
                 });
@@ -239,7 +241,7 @@ namespace Models.Migrations
                     b.HasOne("Models.MessageModels.MessageSender", "MessageSender")
                         .WithMany("MessageRecievers")
                         .HasForeignKey("MessageSenderId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Test.Models.UserModels.User", "User")

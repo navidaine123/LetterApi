@@ -37,6 +37,16 @@ namespace Repository
             return messageRecievers;
         }
 
+        public async override Task<MessageReciever> GetAsync(object key)
+        {
+            return await _smContext
+                    .MessageRecievers
+                    .Include(x => x.Message)
+                    .Include(x => x.MessageSender)
+                    .Include(x => x.ResentMessages)
+                    .FirstOrDefaultAsync(x => x.Id == (Guid)key);
+        }
+
         public async Task<List<MessageReciever>> GetMessagesRecieveByAync(Guid id)
         {
             try

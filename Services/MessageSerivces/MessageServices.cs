@@ -7,6 +7,7 @@ using Services.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -41,6 +42,10 @@ namespace Services.MessageSerivces
         Task<string> RestoreDeletedMessageAsync(Guid id);
 
         Task<string> SendFromDraftAsync(Guid id);
+
+        Task<ReplyMessageDTO> CreateReplyMessageAsync(Guid senderId, Guid replyToId);
+
+        Task<bool> ReplyMessageAsync(ReplyMessageDTO replyMessageDTO);
     }
 
     public class MessageServices : IMessageServices
@@ -73,6 +78,7 @@ namespace Services.MessageSerivces
             var message = new Message()
             {
                 CreatedById = creatorId,
+
                 MessageCode = await GenerateMessageCodeAsync(),
             };
             message.MessageNumber = GenerateMessageNumber(message.MessageCode);
@@ -169,8 +175,9 @@ namespace Services.MessageSerivces
         public async Task<List<MsgBoxDTO>> GetMessagesRecievedbyAsync(Guid id)
         {
             var messages =
-                (await _messageRecieverRepository.GetMessagesRecieveByAync(id))
-                .Where(x => x.DeletedDate == null)
+                (await _messageRecieverRepository
+                .GetMessagesRecieveByAync(id))
+                .Where(x => x.DeletedDate == null && x.MessageSender.IsSent == true)
                 .ToList();
 
             List<MsgBoxDTO> msgBoxDTO = new List<MsgBoxDTO>();
@@ -396,6 +403,7 @@ namespace Services.MessageSerivces
                 .GetAsync(id);
 
             message.IsSent = true;
+            message.Message.CreateOn = DateTime.UtcNow;
 
             message =
                 await _messageSenderRepository
@@ -406,6 +414,78 @@ namespace Services.MessageSerivces
             return "پیام ارسال شد";
         }
 
-        
+        public async Task<ReplyMessageDTO> CreateReplyMessageAsync(Guid senderId, Guid replyToMessageRecieverId)
+        {
+            try
+            {
+                var replyToMessage = await _messageRecieverRepository
+               .GetAsync(replyToMessageRecieverId);
+
+                var message = new Message()
+                {
+                    CreatedById = senderId,
+                    CreateOn = DateTime.UtcNow,
+                    MessageCode = await GenerateMessageCodeAsync(),
+                    Subject = $"پاسخ به نامه {replyToMessage.Message.MessageNumber}",
+                    // TODO
+                    MessageNumber = null
+                };
+
+                var t1 = _messageRepository.AddAsync(message);
+
+                var sender = new MessageSender()
+                {
+                    UserId = senderId,
+                    MessageId = message.Id,
+                    ReplyToId = replyToMessageRecieverId,
+                };
+
+                var t2 = _messageSenderRepository.AddAsync(sender);
+
+                var reciever = new MessageReciever()
+                {
+                    IsCc = false,
+                    MessageId = message.Id,
+                    UserId = replyToMessage.MessageSender.UserId,
+                    MessageSenderId = sender.Id
+                };
+
+                var t3 = _messageRecieverRepository.AddAsync(reciever);
+
+                Task.WaitAll(t1, t2, t3);
+                await _unitOfWork.SaveAsync();
+
+                var replyMessageDto = new ReplyMessageDTO();
+
+                _mapper.Map(sender, replyMessageDto);
+
+                return replyMessageDto;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> ReplyMessageAsync(ReplyMessageDTO replyMessageDTO)
+        {
+            try
+            {
+                var messageSender = new MessageSender();
+
+                _mapper.Map(replyMessageDTO, messageSender);
+
+                messageSender = await _messageSenderRepository
+                    .UpdateAsync(messageSender, messageSender.Id);
+
+                await _unitOfWork.SaveAsync();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
     }
 }
