@@ -35,12 +35,11 @@ namespace Test.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> GetAll()
         {
             var users = await _userService.GetAllUsersAsync();
-            //return Ok(_pagination.PagedList(users, pageNumber, itemsPerPage));
-            var data = new PaginationDto<UserDto>(users, pageNumber, itemsPerPage);
-            return Ok(data);
+
+            return Ok(users);
         }
     }
 }

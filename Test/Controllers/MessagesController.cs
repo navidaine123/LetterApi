@@ -95,6 +95,7 @@ namespace Test.Controllers
         /// <returns>recieved messages</returns>
         [HttpGet]
         public async Task<IActionResult> ShowInboxAsync(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowInbox()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -102,7 +103,7 @@ namespace Test.Controllers
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
             var inboxMessages = await _messageServices.GetMessagesRecievedbyAsync(id);
 
-            return Ok(new PaginationDto<MsgBoxDTO>(inboxMessages, pageNumber, itemsPerPage));
+            return Ok(inboxMessages);
         }
 
         /// <summary>
@@ -111,6 +112,7 @@ namespace Test.Controllers
         /// <returns>sent messages</returns>
         [HttpGet]
         public async Task<IActionResult> ShowOutBoxAsync(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowOutBox()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -118,7 +120,7 @@ namespace Test.Controllers
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var outBox = await _messageServices.GetSendOrDraftMessagesByIdAync(id, true);
-            return Ok(new PaginationDto<MsgBoxDTO>(outBox, pageNumber, itemsPerPage));
+            return Ok(outBox);
         }
 
         /// <summary>
@@ -127,7 +129,7 @@ namespace Test.Controllers
         /// <returns>drafted messages</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowDraftBoxAsync(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowDraftBox()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -135,7 +137,7 @@ namespace Test.Controllers
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var draftBox = await _messageServices.GetSendOrDraftMessagesByIdAync(id, false);
-            return Ok(new PaginationDto<MsgBoxDTO>(draftBox, pageNumber, itemsPerPage));
+            return Ok(draftBox);
         }
 
         /// <summary>
@@ -144,7 +146,7 @@ namespace Test.Controllers
         /// <returns>important messages</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowImportantMessaesAsync(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowImportantMessaesAsync()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -152,7 +154,7 @@ namespace Test.Controllers
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var impMsg = await _messageServices.GetImportantSentMessages(id);
-            return Ok(new PaginationDto<MsgBoxDTO>(impMsg, pageNumber, itemsPerPage));
+            return Ok(impMsg);
         }
 
         /// <summary>
@@ -181,7 +183,7 @@ namespace Test.Controllers
         /// <returns>true or false</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowMarkedMessagesAsync(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowMarkedMessagesAsync()
         {
             if (User.Claims == null)
                 return BadRequest(ResponseMessage.NotAuthentication);
@@ -190,7 +192,7 @@ namespace Test.Controllers
 
             var result = await _messageServices.GetMarkedMessage(id);
 
-            return Ok(new PaginationDto<MsgBoxDTO>(result, pageNumber, itemsPerPage));
+            return Ok(result);
         }
 
         /// <summary>
@@ -226,13 +228,13 @@ namespace Test.Controllers
         /// <returns>deleted messages</returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ShowDeletedMessageAsync(int pageNumber = 1, int itemsPerPage = 10)
+        public async Task<IActionResult> ShowDeletedMessage()
         {
             var deletedMessages =
                 await _messageServices
                 .GetDeletedMessage(_userService.GetUSerIDFromUserClaims(User.Claims));
             if (deletedMessages != null)
-                return Ok(new PaginationDto<MsgBoxDTO>(deletedMessages, pageNumber, itemsPerPage));
+                return Ok(deletedMessages);
 
             return Ok("no message has deleted");
         }
