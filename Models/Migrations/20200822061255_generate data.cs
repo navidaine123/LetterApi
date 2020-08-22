@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Models.Migrations
 {
-    public partial class Messages : Migration
+    public partial class generatedata : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -43,6 +43,7 @@ namespace Models.Migrations
                     CreateOn = table.Column<DateTime>(nullable: false),
                     CreatedById = table.Column<Guid>(nullable: false),
                     MessageNumber = table.Column<string>(nullable: true),
+                    MessageCode = table.Column<string>(nullable: true),
                     ImportanceLevel = table.Column<byte>(nullable: false),
                     DueDate = table.Column<DateTime>(nullable: true)
                 },
@@ -65,9 +66,11 @@ namespace Models.Migrations
                     Prove = table.Column<string>(nullable: true),
                     IsSent = table.Column<bool>(nullable: false),
                     DeletedDate = table.Column<DateTime>(nullable: true),
+                    IsMarked = table.Column<bool>(nullable: false),
                     ResendOnId = table.Column<Guid>(nullable: true),
-                    UserId = table.Column<Guid>(nullable: true),
-                    MessageId = table.Column<Guid>(nullable: true)
+                    UserId = table.Column<Guid>(nullable: false),
+                    MessageId = table.Column<Guid>(nullable: false),
+                    ReplyToId = table.Column<Guid>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -77,13 +80,18 @@ namespace Models.Migrations
                         column: x => x.MessageId,
                         principalTable: "Messages",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MessageSenders_Messages_ReplyToId",
+                        column: x => x.ReplyToId,
+                        principalTable: "Messages",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MessageSenders_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -93,8 +101,10 @@ namespace Models.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     SeenDate = table.Column<DateTime>(nullable: true),
                     IsCc = table.Column<bool>(nullable: false),
-                    UserId = table.Column<Guid>(nullable: true),
-                    MessageId = table.Column<Guid>(nullable: true),
+                    DeletedDate = table.Column<DateTime>(nullable: true),
+                    IsMarked = table.Column<bool>(nullable: false),
+                    UserId = table.Column<Guid>(nullable: false),
+                    MessageId = table.Column<Guid>(nullable: false),
                     MessageSenderId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
@@ -105,25 +115,24 @@ namespace Models.Migrations
                         column: x => x.MessageId,
                         principalTable: "Messages",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_MessageRecievers_MessageSenders_MessageSenderId",
                         column: x => x.MessageSenderId,
                         principalTable: "MessageSenders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MessageRecievers_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "AccessFailedCount", "DetailId", "FirstName", "IsDeleted", "LastName", "LockoutEnabled", "LockoutEnd", "Mobile", "NationalCode", "PasswordHash", "PasswordSalt", "Phone", "PmPasswordHash", "PmUniqueId", "UserName" },
-                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), 0, null, "نوید", false, "آیینه وند", false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "09361060437", "98", new byte[] { 236, 133, 41, 92, 178, 133, 29, 219, 59, 223, 53, 153, 94, 60, 166, 187, 116, 16, 240, 97, 34, 148, 216, 123, 47, 229, 89, 206, 123, 35, 57, 232, 143, 30, 85, 225, 123, 99, 221, 240, 75, 49, 179, 219, 86, 44, 96, 31, 209, 161, 100, 112, 101, 162, 253, 115, 93, 101, 211, 50, 5, 167, 247, 57 }, new byte[] { 190, 195, 99, 40, 223, 77, 183, 180, 80, 83, 12, 67, 15, 150, 60, 16, 145, 44, 176, 95, 190, 21, 114, 42, 119, 227, 142, 175, 250, 103, 18, 231, 208, 207, 238, 185, 46, 57, 161, 149, 64, 54, 206, 174, 211, 104, 32, 212, 198, 245, 172, 84, 127, 113, 17, 144, 251, 219, 78, 225, 114, 129, 204, 254, 220, 168, 19, 213, 103, 6, 197, 226, 207, 19, 79, 65, 97, 106, 82, 210, 189, 182, 35, 248, 34, 227, 60, 198, 197, 43, 58, 94, 169, 167, 43, 119, 34, 157, 239, 228, 45, 129, 209, 142, 15, 12, 111, 209, 35, 14, 211, 50, 31, 234, 153, 115, 209, 72, 40, 71, 69, 23, 56, 136, 11, 43, 194, 143 }, null, null, null, "navid" });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), 0, null, "نوید", false, "آیینه وند", false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "09361060437", "98", new byte[] { 79, 140, 73, 202, 168, 137, 19, 1, 157, 97, 228, 16, 235, 70, 81, 129, 185, 200, 240, 15, 61, 12, 8, 248, 93, 28, 207, 161, 110, 189, 158, 74, 5, 94, 105, 90, 71, 11, 106, 153, 226, 247, 177, 14, 196, 9, 64, 101, 215, 160, 244, 135, 121, 64, 138, 43, 131, 77, 52, 22, 89, 123, 113, 130 }, new byte[] { 4, 252, 120, 40, 69, 115, 111, 231, 250, 182, 113, 99, 109, 99, 212, 242, 59, 116, 231, 239, 152, 166, 67, 199, 84, 58, 70, 105, 174, 160, 240, 139, 134, 126, 134, 122, 135, 222, 80, 191, 191, 16, 149, 81, 121, 84, 38, 249, 233, 57, 117, 12, 6, 244, 42, 118, 203, 191, 188, 47, 249, 202, 172, 112, 233, 110, 16, 79, 131, 214, 113, 87, 110, 54, 192, 128, 160, 88, 203, 201, 237, 245, 53, 206, 234, 182, 213, 69, 127, 122, 86, 192, 182, 235, 36, 61, 89, 14, 10, 40, 188, 225, 203, 69, 203, 90, 116, 166, 143, 138, 207, 90, 207, 151, 107, 255, 50, 114, 6, 180, 6, 68, 67, 238, 62, 39, 136, 191 }, null, null, null, "navid" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_MessageRecievers_MessageId",
@@ -149,6 +158,12 @@ namespace Models.Migrations
                 name: "IX_MessageSenders_MessageId",
                 table: "MessageSenders",
                 column: "MessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MessageSenders_ReplyToId",
+                table: "MessageSenders",
+                column: "ReplyToId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MessageSenders_ResendOnId",
@@ -177,6 +192,10 @@ namespace Models.Migrations
 
             migrationBuilder.DropForeignKey(
                 name: "FK_MessageSenders_Messages_MessageId",
+                table: "MessageSenders");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_MessageSenders_Messages_ReplyToId",
                 table: "MessageSenders");
 
             migrationBuilder.DropForeignKey(

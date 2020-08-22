@@ -33,5 +33,7 @@ namespace Models.MessageModels
         public List<MessageReciever> MessageRecievers { get; set; }
 
         public List<MessageSender> MessageSenders { get; set; }
+
+        public MessageSender ReplyFrom { get; set; }
     }
 }

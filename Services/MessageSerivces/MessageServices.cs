@@ -45,7 +45,6 @@ namespace Services.MessageSerivces
 
         Task<ReplyMessageDTO> CreateReplyMessageAsync(Guid senderId, Guid replyToId);
 
-        Task<bool> ReplyMessageAsync(ReplyMessageDTO replyMessageDTO);
     }
 
     public class MessageServices : IMessageServices
@@ -414,21 +413,21 @@ namespace Services.MessageSerivces
             return "پیام ارسال شد";
         }
 
-        public async Task<ReplyMessageDTO> CreateReplyMessageAsync(Guid senderId, Guid replyToMessageRecieverId)
+        public async Task<ReplyMessageDTO> CreateReplyMessageAsync(Guid senderId, Guid replyToMessageId)
         {
             try
             {
-                var replyToMessage = await _messageRecieverRepository
-               .GetAsync(replyToMessageRecieverId);
+                var replyToMessage = await _messageRepository
+               .GetAsync(replyToMessageId);
 
                 var message = new Message()
                 {
                     CreatedById = senderId,
                     CreateOn = DateTime.UtcNow,
                     MessageCode = await GenerateMessageCodeAsync(),
-                    Subject = $"پاسخ به نامه {replyToMessage.Message.MessageNumber}",
+                    Subject = $"پاسخ به نامه {replyToMessage.MessageNumber}",
                     // TODO
-                    MessageNumber = null
+                    MessageNumber = null,
                 };
 
                 var t1 = _messageRepository.AddAsync(message);
@@ -437,7 +436,8 @@ namespace Services.MessageSerivces
                 {
                     UserId = senderId,
                     MessageId = message.Id,
-                    ReplyToId = replyToMessageRecieverId,
+                    ReplyToId = message.Id,
+                    Message = message,
                 };
 
                 var t2 = _messageSenderRepository.AddAsync(sender);
@@ -446,8 +446,8 @@ namespace Services.MessageSerivces
                 {
                     IsCc = false,
                     MessageId = message.Id,
-                    UserId = replyToMessage.MessageSender.UserId,
-                    MessageSenderId = sender.Id
+                    MessageSenderId = sender.Id,
+                    UserId = message.CreatedById,
                 };
 
                 var t3 = _messageRecieverRepository.AddAsync(reciever);
@@ -467,25 +467,5 @@ namespace Services.MessageSerivces
             }
         }
 
-        public async Task<bool> ReplyMessageAsync(ReplyMessageDTO replyMessageDTO)
-        {
-            try
-            {
-                var messageSender = new MessageSender();
-
-                _mapper.Map(replyMessageDTO, messageSender);
-
-                messageSender = await _messageSenderRepository
-                    .UpdateAsync(messageSender, messageSender.Id);
-
-                await _unitOfWork.SaveAsync();
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-        }
     }
 }

@@ -35,7 +35,5 @@ namespace Models.MessageModels
         public MessageSender MessageSender { get; set; }
 
         public virtual ICollection<MessageSender> ResentMessages { get; set; }
-
-        public List<MessageSender> ReplyFrom { get; set; }
     }
 }

@@ -37,6 +37,6 @@ namespace Models.MessageModels
 
         public Nullable<Guid> ReplyToId { get; set; }
 
-        public MessageReciever ReplyTo { get; set; }
+        public Message ReplyTo { get; set; }
     }
 }

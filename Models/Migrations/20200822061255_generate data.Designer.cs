@@ -9,8 +9,8 @@ using Models;
 namespace Models.Migrations
 {
     [DbContext(typeof(SmContext))]
-    [Migration("20200729100442_generateIds")]
-    partial class generateIds
+    [Migration("20200822061255_generate data")]
+    partial class generatedata
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -62,7 +62,13 @@ namespace Models.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<bool>("IsCc")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsMarked")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<Guid>("MessageId")
@@ -97,6 +103,9 @@ namespace Models.Migrations
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<bool>("IsMarked")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<bool>("IsSent")
                         .HasColumnType("tinyint(1)");
 
@@ -105,6 +114,9 @@ namespace Models.Migrations
 
                     b.Property<string>("Prove")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<Guid?>("ReplyToId")
+                        .HasColumnType("char(36)");
 
                     b.Property<Guid?>("ResendOnId")
                         .HasColumnType("char(36)");
@@ -115,6 +127,9 @@ namespace Models.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("MessageId");
+
+                    b.HasIndex("ReplyToId")
+                        .IsUnique();
 
                     b.HasIndex("ResendOnId");
 
@@ -201,8 +216,8 @@ namespace Models.Migrations
                             LockoutEnd = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Mobile = "09361060437",
                             NationalCode = "98",
-                            PasswordHash = new byte[] { 187, 182, 220, 151, 65, 217, 94, 153, 178, 54, 232, 203, 23, 240, 179, 250, 142, 76, 114, 234, 227, 132, 251, 151, 63, 231, 135, 191, 113, 135, 168, 206, 110, 71, 101, 50, 188, 241, 25, 228, 5, 210, 173, 148, 164, 255, 223, 156, 92, 27, 145, 241, 145, 60, 12, 101, 157, 253, 9, 21, 64, 225, 74, 239 },
-                            PasswordSalt = new byte[] { 7, 140, 219, 236, 175, 73, 96, 120, 8, 86, 208, 179, 216, 55, 112, 142, 119, 3, 172, 29, 4, 66, 55, 140, 122, 142, 198, 90, 103, 3, 82, 41, 255, 187, 97, 35, 79, 141, 103, 92, 4, 40, 54, 204, 79, 122, 144, 20, 90, 225, 131, 192, 145, 240, 161, 49, 115, 136, 49, 223, 166, 71, 130, 248, 226, 211, 221, 17, 238, 84, 124, 227, 26, 194, 184, 211, 90, 109, 76, 246, 13, 27, 19, 196, 170, 87, 162, 91, 99, 190, 179, 71, 211, 228, 153, 222, 98, 120, 30, 210, 30, 234, 166, 53, 212, 22, 9, 0, 203, 178, 238, 188, 44, 29, 191, 230, 76, 213, 92, 99, 123, 223, 161, 234, 64, 132, 205, 102 },
+                            PasswordHash = new byte[] { 79, 140, 73, 202, 168, 137, 19, 1, 157, 97, 228, 16, 235, 70, 81, 129, 185, 200, 240, 15, 61, 12, 8, 248, 93, 28, 207, 161, 110, 189, 158, 74, 5, 94, 105, 90, 71, 11, 106, 153, 226, 247, 177, 14, 196, 9, 64, 101, 215, 160, 244, 135, 121, 64, 138, 43, 131, 77, 52, 22, 89, 123, 113, 130 },
+                            PasswordSalt = new byte[] { 4, 252, 120, 40, 69, 115, 111, 231, 250, 182, 113, 99, 109, 99, 212, 242, 59, 116, 231, 239, 152, 166, 67, 199, 84, 58, 70, 105, 174, 160, 240, 139, 134, 126, 134, 122, 135, 222, 80, 191, 191, 16, 149, 81, 121, 84, 38, 249, 233, 57, 117, 12, 6, 244, 42, 118, 203, 191, 188, 47, 249, 202, 172, 112, 233, 110, 16, 79, 131, 214, 113, 87, 110, 54, 192, 128, 160, 88, 203, 201, 237, 245, 53, 206, 234, 182, 213, 69, 127, 122, 86, 192, 182, 235, 36, 61, 89, 14, 10, 40, 188, 225, 203, 69, 203, 90, 116, 166, 143, 138, 207, 90, 207, 151, 107, 255, 50, 114, 6, 180, 6, 68, 67, 238, 62, 39, 136, 191 },
                             UserName = "navid"
                         });
                 });
@@ -227,11 +242,11 @@ namespace Models.Migrations
                     b.HasOne("Models.MessageModels.MessageSender", "MessageSender")
                         .WithMany("MessageRecievers")
                         .HasForeignKey("MessageSenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Test.Models.UserModels.User", "User")
-                        .WithMany()
+                        .WithMany("MessageRecievers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -245,12 +260,17 @@ namespace Models.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Models.MessageModels.Message", "ReplyTo")
+                        .WithOne("ReplyFrom")
+                        .HasForeignKey("Models.MessageModels.MessageSender", "ReplyToId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Models.MessageModels.MessageReciever", "ResendOn")
                         .WithMany("ResentMessages")
                         .HasForeignKey("ResendOnId");
 
                     b.HasOne("Test.Models.UserModels.User", "User")
-                        .WithMany()
+                        .WithMany("MessageSenders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

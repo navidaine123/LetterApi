@@ -5,6 +5,7 @@ using Models.MessageModels;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Test.Models.UserModels;
 
@@ -50,10 +51,10 @@ namespace Models
             modelBuilder.ApplyConfiguration(new MessageRecieverMapping());
             modelBuilder.ApplyConfiguration(new MessageSenderMapping());
             modelBuilder
-                .Entity<MessageSender>()
-                .HasOne(x => x.ReplyTo)
-                .WithMany(x => x.ReplyFrom)
-                .HasForeignKey(x => x.ReplyToId)
+                .Entity<Message>()
+                .HasOne<MessageSender>(x => x.ReplyFrom)
+                .WithOne(x => x.ReplyTo)
+                .HasForeignKey<MessageSender>(x => x.ReplyToId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             #endregion Mapping

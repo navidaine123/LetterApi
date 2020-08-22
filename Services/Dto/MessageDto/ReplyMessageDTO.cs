@@ -8,13 +8,11 @@ namespace Services.Dto.MessageDto
 {
     public class ReplyMessageDTO
     {
-        public Guid MessageSenderId { get; set; }
+        public Guid Id { get; set; }
 
-        public Guid MessageRecieverId { get; set; }
+        public Guid MessageCreatedById { get; set; }
 
-        public string MessageCreatedByFullName { get; set; }
-
-        public string MessageRecieverUserFullName { get; set; }
+        public Guid MessageRecieversUserId { get; set; }
 
         public string MessageSubject { get; set; }
 

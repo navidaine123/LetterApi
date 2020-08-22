@@ -267,21 +267,13 @@ namespace Test.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> CreateReplyMessageAsync(Guid replyToMessageRecieverId)
+        public async Task<IActionResult> CreateReplyMessageAsync(Guid replyToMessageId)
         {
             var senderId = _userService.GetUSerIDFromUserClaims(User.Claims);
 
-            return Ok(await _messageServices.CreateReplyMessageAsync(senderId, replyToMessageRecieverId));
+            return Ok(await _messageServices.CreateReplyMessageAsync(senderId, replyToMessageId));
         }
 
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> ReplyMessageAsync(ReplyMessageDTO replyMessageDTO)
-        {
-            if (await _messageServices.ReplyMessageAsync(replyMessageDTO))
-                return Ok("حله");
-
-            return BadRequest("نشد");
-        }
+        
     }
 }
