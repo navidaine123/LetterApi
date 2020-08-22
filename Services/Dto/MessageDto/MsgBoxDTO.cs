@@ -31,6 +31,8 @@ namespace Services.Dto.MessageDto
 
         public string MessageNumber { get; set; }
 
+        public Guid MessageId { get; set; }
+
         public string MessageCode { get; set; }
 
         public ImportanceLevel ImportanceLevel { get; set; }

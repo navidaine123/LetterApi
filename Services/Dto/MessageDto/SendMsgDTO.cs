@@ -13,11 +13,9 @@ namespace Services.Dto.MessageDto
 
         public List<Guid> Cc { get; set; }
 
-        public Guid FromId { get; set; }
+        public Guid CreatedById { get; set; }
 
         public Guid Id { get; set; }
-
-        public string FromFullName { get; set; }
 
         public string Subject { get; set; }
 
@@ -25,16 +23,12 @@ namespace Services.Dto.MessageDto
 
         public DateTime CreateOn { get; set; } = DateTime.UtcNow;
 
-        //public Guid CreatedById { get; set; }
-
-        public string CreatedByName { get; set; }
-
         public string MessageNumber { get; set; }
-
-        public string MessageCode { get; set; }
 
         public ImportanceLevel ImportanceLevel { get; set; }
 
         public Nullable<DateTime> DueDate { get; set; }
+
+        public Guid MessageSendersId { get; set; }
     }
 }

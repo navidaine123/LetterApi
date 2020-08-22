@@ -23,7 +23,14 @@ namespace Repository
             _smContext = smContext;
         }
 
-        public async Task<Message> GetLastOfMessagesAsync() 
+        public override async Task<Message> GetAsync(object key) => await _smContext.Messages
+                .Include(x => x.MessageSenders)
+                .ThenInclude(x => x.User)
+                .Include(x => x.MessageRecievers)
+                .ThenInclude(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == (Guid)key);
+
+        public async Task<Message> GetLastOfMessagesAsync()
             => await _smContext.Messages
             .Select(x => x)
             .FirstOrDefaultAsync();

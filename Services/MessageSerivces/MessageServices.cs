@@ -3,19 +3,16 @@ using Models.Enums;
 using Models.MessageModels;
 using Repository;
 using Services.Dto.MessageDto;
-using Services.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Services.MessageSerivces
 {
     public interface IMessageServices
     {
-        Task<Message> CreateMessageAsync(Guid creator);
+        Task<SendMsgDTO> CreateMessageAsync(Guid creator);
 
         Task<bool> MessageAction(SendMsgDTO messageDto, bool isSent, Guid senderId);
 
@@ -41,10 +38,11 @@ namespace Services.MessageSerivces
 
         Task<string> RestoreDeletedMessageAsync(Guid id);
 
-        Task<string> SendFromDraftAsync(Guid id);
+        Task<SendMsgDTO> GetMessageForEditAsync(Guid id);
 
-        Task<ReplyMessageDTO> CreateReplyMessageAsync(Guid senderId, Guid replyToId);
+        Task<SendMsgDTO> GetReplyMessageAsync(Guid senderId, Guid replyToId);
 
+        Task<SendMsgDTO> GetMessageForRead(Guid messageId, Guid userId, Guid recieverId);
     }
 
     public class MessageServices : IMessageServices
@@ -72,7 +70,7 @@ namespace Services.MessageSerivces
 
         #endregion constructors
 
-        public async Task<Message> CreateMessageAsync(Guid creatorId)
+        public async Task<SendMsgDTO> CreateMessageAsync(Guid creatorId)
         {
             var message = new Message()
             {
@@ -81,11 +79,24 @@ namespace Services.MessageSerivces
                 MessageCode = await GenerateMessageCodeAsync(),
             };
             message.MessageNumber = GenerateMessageNumber(message.MessageCode);
-
             await _unitOfWork.MessageRepository.AddAsync(message);
+
+            var messageSender = new MessageSender
+            {
+                MessageId = message.Id,
+                UserId = creatorId,
+            };
+
+            await _messageSenderRepository.AddAsync(messageSender);
+
             await _unitOfWork.SaveAsync();
 
-            return message;
+            var messageDto = new SendMsgDTO();
+
+            _mapper.Map(message, messageDto);
+            messageDto.MessageSendersId = messageSender.Id;
+
+            return messageDto;
         }
 
         /// <summary>
@@ -105,17 +116,23 @@ namespace Services.MessageSerivces
                     return false;
                 _mapper.Map(messageDto, message);
 
-                var messageSender = new MessageSender
+                var messageSender =
+                    await _messageSenderRepository
+                    .GetAsync(messageDto.MessageSendersId);
+                if (isSent)
                 {
-                    MessageId = messageDto.Id,
-                    IsSent = isSent,
-                    UserId = senderId
-                };
+                    messageSender.IsSent = true;
+                    messageSender.Message.CreateOn = DateTime.UtcNow;
+                }
+
+                var messageRecieversToRemove = messageSender.MessageRecievers.ToList();
+                if (messageRecieversToRemove != null)
+                    RemoveRecievers(messageRecieversToRemove);
 
                 var messageRecievers = await MessageRecieversListAsync(messageDto, messageSender);
 
                 var messageResult = await _messageRepository.UpdateAsync(message, message.Id);
-                var messageSenderResult = await _messageSenderRepository.AddAsync(messageSender);
+                var messageSenderResult = await _messageSenderRepository.UpdateAsync(messageSender, messageSender.Id);
                 var messageRecieverResult = await _messageRecieverRepository.AddRangeAsync(messageRecievers);
 
                 await _unitOfWork.SaveAsync();
@@ -139,6 +156,11 @@ namespace Services.MessageSerivces
         }
 
         private string GenerateMessageNumber(string code) => code + DateTime.UtcNow.Date.ToString();
+
+        private void RemoveRecievers(List<MessageReciever> messageRecievers)
+        {
+            _messageRecieverRepository.RemoveRange(messageRecievers);
+        }
 
         private async Task<List<MessageReciever>> MessageRecieversListAsync(SendMsgDTO messageDto, MessageSender messageSender)
         {
@@ -395,25 +417,25 @@ namespace Services.MessageSerivces
             }
         }
 
-        public async Task<string> SendFromDraftAsync(Guid id)
+        public async Task<SendMsgDTO> GetMessageForEditAsync(Guid id)
         {
-            var message =
+            var messageSender =
                 await _messageSenderRepository
                 .GetAsync(id);
 
-            message.IsSent = true;
-            message.Message.CreateOn = DateTime.UtcNow;
+            var message =
+                await _messageRepository
+                .GetAsync(messageSender.MessageId);
 
-            message =
-                await _messageSenderRepository
-                .UpdateAsync(message, id);
+            var dto = new SendMsgDTO();
 
-            await _unitOfWork.SaveAsync();
+            _mapper.Map(message, dto);
+            dto.MessageSendersId = id;
 
-            return "پیام ارسال شد";
+            return dto;
         }
 
-        public async Task<ReplyMessageDTO> CreateReplyMessageAsync(Guid senderId, Guid replyToMessageId)
+        public async Task<SendMsgDTO> GetReplyMessageAsync(Guid senderId, Guid replyToMessageId)
         {
             try
             {
@@ -423,7 +445,6 @@ namespace Services.MessageSerivces
                 var message = new Message()
                 {
                     CreatedById = senderId,
-                    CreateOn = DateTime.UtcNow,
                     MessageCode = await GenerateMessageCodeAsync(),
                     Subject = $"پاسخ به نامه {replyToMessage.MessageNumber}",
                     // TODO
@@ -455,10 +476,10 @@ namespace Services.MessageSerivces
                 Task.WaitAll(t1, t2, t3);
                 await _unitOfWork.SaveAsync();
 
-                var replyMessageDto = new ReplyMessageDTO();
+                var replyMessageDto = new SendMsgDTO();
 
-                _mapper.Map(sender, replyMessageDto);
-
+                _mapper.Map(message, replyMessageDto);
+                replyMessageDto.MessageSendersId = sender.Id;
                 return replyMessageDto;
             }
             catch (Exception e)
@@ -467,5 +488,30 @@ namespace Services.MessageSerivces
             }
         }
 
+        public async Task<SendMsgDTO> GetMessageForRead(Guid messageId, Guid userId, Guid recieverId)
+        {
+            var message = await _messageRepository
+                .GetAsync(messageId);
+
+            if (recieverId != null)
+            {
+                if (message.MessageRecievers
+                .Where(x => x.UserId == userId)
+                .FirstOrDefault().SeenDate == null)
+                {
+                    message.MessageRecievers
+                    .Where(x => x.UserId == userId)
+                    .FirstOrDefault().SeenDate = DateTime.UtcNow;
+
+                    var res = await _messageRepository.UpdateAsync(message, messageId);
+                    await _unitOfWork.SaveAsync();
+                }
+            }
+
+            var dto = new SendMsgDTO();
+            _mapper.Map(message, dto);
+            dto.MessageSendersId = message.MessageRecievers.FirstOrDefault(x => x.UserId == userId).MessageSenderId;
+            return dto;
+        }
     }
 }

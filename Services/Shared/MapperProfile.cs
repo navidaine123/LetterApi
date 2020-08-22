@@ -23,9 +23,10 @@ namespace Services.Shared
                 .ForMember(x => x.Id, option => option.Ignore());
 
             CreateMap<Message, SendMsgDTO>()
+                .ForMember(x => x.Cc, opt => opt.MapFrom(x => x.MessageRecievers.Where(x => x.IsCc).Select(s => s.UserId)))
+                .ForMember(x => x.To, opt => opt.MapFrom(x => x.MessageRecievers.Where(x => !x.IsCc).Select(s => s.UserId)))
                 .ReverseMap()
-                .ForMember(x => x.Id, option => option.Ignore())
-                .ForMember(x => x.CreatedBy, option => option.Ignore());
+                .ForMember(x => x.MessageRecievers, opt => opt.Ignore());
 
             CreateMap<Message, MsgBoxDTO>()
                 .ReverseMap()

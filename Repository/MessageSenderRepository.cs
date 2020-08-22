@@ -47,5 +47,11 @@ namespace Repository
                 throw (e);
             }
         }
+
+        public override async Task<MessageSender> GetAsync(object key) =>
+            await _smContext.MessageSenders
+            .Include(x => x.MessageRecievers)
+            .ThenInclude(x => x.User)
+            .FirstOrDefaultAsync(x => x.Id == (Guid)key);
     }
 }

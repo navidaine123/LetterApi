@@ -14,6 +14,8 @@ namespace Repository
         Task<List<MessageReciever>> AddRangeAsync(List<MessageReciever> messageRecievers);
 
         Task<List<MessageReciever>> GetMessagesRecieveByAync(Guid id);
+
+        bool RemoveRange(List<MessageReciever> messageRecievers);
     }
 
     public class MessageRecieverRepository : GenericRepository<MessageReciever>, IMessageRecieverRepository
@@ -63,6 +65,20 @@ namespace Repository
             catch (Exception e)
             {
                 throw (e);
+            }
+        }
+
+        public bool RemoveRange(List<MessageReciever> messageRecievers)
+        {
+            try
+            {
+                _smContext.RemoveRange(messageRecievers);
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
     }

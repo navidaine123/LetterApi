@@ -42,15 +42,11 @@ namespace Test.Controllers
         [Authorize]
         public async Task<IActionResult> CreateAsync()
         {
-            var userClaims = User.Claims;
-            if (userClaims == null)
-                return BadRequest(ResponseMessage.NotAuthentication);
+            var creatorId = _userService.GetUSerIDFromUserClaims(User.Claims);
 
-            var creatorId = _userService.GetUSerIDFromUserClaims(userClaims);
+            var messageDto = await _messageServices.CreateMessageAsync(creatorId);
 
-            var message = await _messageServices.CreateMessageAsync(creatorId);
-
-            return Ok(message);
+            return Ok(messageDto);
         }
 
         /// <summary>
@@ -59,11 +55,9 @@ namespace Test.Controllers
         /// <param name="messageDto">created message with content and subject</param>
         /// <returns>a comment about message sending status</returns>
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> SendMessageAsync(SendMsgDTO messageDto)
         {
-            if (User.Claims == null)
-                return BadRequest(ResponseMessage.NotAuthentication);
-
             var senderId = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             if (await _messageServices.MessageAction(messageDto, true, senderId))
@@ -77,11 +71,9 @@ namespace Test.Controllers
         /// <param name="messageDto">created message with content and subject</param>
         /// <returns>a comment about message drafting status</returns>
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> DraftMessageAsync(SendMsgDTO messageDto)
         {
-            if (User.Claims == null)
-                return BadRequest(ResponseMessage.NotAuthentication);
-
             var senderId = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             if (await _messageServices.MessageAction(messageDto, false, senderId))
@@ -94,11 +86,9 @@ namespace Test.Controllers
         /// </summary>
         /// <returns>recieved messages</returns>
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> ShowInboxAsync()
         {
-            if (User.Claims == null)
-                return BadRequest(ResponseMessage.NotAuthentication);
-
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
             var inboxMessages = await _messageServices.GetMessagesRecievedbyAsync(id);
 
@@ -110,11 +100,9 @@ namespace Test.Controllers
         /// </summary>
         /// <returns>sent messages</returns>
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> ShowOutBoxAsync()
         {
-            if (User.Claims == null)
-                return BadRequest(ResponseMessage.NotAuthentication);
-
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var outBox = await _messageServices.GetSendOrDraftMessagesByIdAync(id, true);
@@ -129,9 +117,6 @@ namespace Test.Controllers
         [Authorize]
         public async Task<IActionResult> ShowDraftBox()
         {
-            if (User.Claims == null)
-                return BadRequest(ResponseMessage.NotAuthentication);
-
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var draftBox = await _messageServices.GetSendOrDraftMessagesByIdAync(id, false);
@@ -146,9 +131,6 @@ namespace Test.Controllers
         [Authorize]
         public async Task<IActionResult> ShowImportantMessaesAsync()
         {
-            if (User.Claims == null)
-                return BadRequest(ResponseMessage.NotAuthentication);
-
             var id = _userService.GetUSerIDFromUserClaims(User.Claims);
 
             var impMsg = await _messageServices.GetImportantSentMessages(id);
@@ -242,11 +224,11 @@ namespace Test.Controllers
         /// </summary>
         /// <param name="id">message sender id</param>
         /// <returns>send status</returns>
-        [HttpPut]
+        [HttpGet]
         [Authorize]
-        public async Task<IActionResult> SendMessageFromDraftBoxAsync(Guid id)
+        public async Task<IActionResult> GetMessageForEditAsync(Guid id)
         {
-            return Ok(await _messageServices.SendFromDraftAsync(id));
+            return Ok(await _messageServices.GetMessageForEditAsync(id));
         }
 
         /// <summary>
@@ -267,13 +249,20 @@ namespace Test.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> CreateReplyMessageAsync(Guid replyToMessageId)
+        public async Task<IActionResult> GetReplyMessageAsync(Guid replyToMessageId)
         {
             var senderId = _userService.GetUSerIDFromUserClaims(User.Claims);
 
-            return Ok(await _messageServices.CreateReplyMessageAsync(senderId, replyToMessageId));
+            return Ok(await _messageServices.GetReplyMessageAsync(senderId, replyToMessageId));
         }
 
-        
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetMessageForRead(Guid messageId, Guid recieverId)
+        {
+            var userId = _userService.GetUSerIDFromUserClaims(User.Claims);
+
+            return Ok(await _messageServices.GetMessageForRead(messageId, userId, recieverId));
+        }
     }
 }
