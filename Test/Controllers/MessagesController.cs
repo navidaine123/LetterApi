@@ -38,7 +38,7 @@ namespace Test.Controllers
         /// Create a new message and generate message number
         /// </summary>
         /// <returns>a new message</returns>
-        [HttpGet]
+        [HttpGet("createMessage")]
         [Authorize]
         public async Task<IActionResult> CreateAsync()
         {
@@ -54,7 +54,7 @@ namespace Test.Controllers
         /// </summary>
         /// <param name="messageDto">created message with content and subject</param>
         /// <returns>a comment about message sending status</returns>
-        [HttpPost]
+        [HttpPost("sendMessage")]
         [Authorize]
         public async Task<IActionResult> SendMessageAsync(SendMsgDTO messageDto)
         {
@@ -70,7 +70,7 @@ namespace Test.Controllers
         /// </summary>
         /// <param name="messageDto">created message with content and subject</param>
         /// <returns>a comment about message drafting status</returns>
-        [HttpPost]
+        [HttpPost("draftMessage")]
         [Authorize]
         public async Task<IActionResult> DraftMessageAsync(SendMsgDTO messageDto)
         {
@@ -85,7 +85,7 @@ namespace Test.Controllers
         /// show messages that user recieved
         /// </summary>
         /// <returns>recieved messages</returns>
-        [HttpGet]
+        [HttpGet("inBox")]
         [Authorize]
         public async Task<IActionResult> ShowInboxAsync()
         {
@@ -99,7 +99,7 @@ namespace Test.Controllers
         /// show messages that user sent
         /// </summary>
         /// <returns>sent messages</returns>
-        [HttpGet]
+        [HttpGet("outBox")]
         [Authorize]
         public async Task<IActionResult> ShowOutBoxAsync()
         {
@@ -113,7 +113,7 @@ namespace Test.Controllers
         /// show messages that user draft
         /// </summary>
         /// <returns>drafted messages</returns>
-        [HttpGet]
+        [HttpGet("draftBox")]
         [Authorize]
         public async Task<IActionResult> ShowDraftBox()
         {
@@ -127,7 +127,7 @@ namespace Test.Controllers
         /// show messages that user recieved or sent that they are important
         /// </summary>
         /// <returns>important messages</returns>
-        [HttpGet]
+        [HttpGet("importantMessages")]
         [Authorize]
         public async Task<IActionResult> ShowImportantMessaesAsync()
         {
@@ -161,7 +161,7 @@ namespace Test.Controllers
         /// else unmarked message and set ismarked value false
         /// </summary>
         /// <returns>true or false</returns>
-        [HttpGet]
+        [HttpGet("markedMessage")]
         [Authorize]
         public async Task<IActionResult> ShowMarkedMessagesAsync()
         {
@@ -224,7 +224,7 @@ namespace Test.Controllers
         /// </summary>
         /// <param name="id">message sender id</param>
         /// <returns>send status</returns>
-        [HttpGet]
+        [HttpGet("getForEdit/{id}")]
         [Authorize]
         public async Task<IActionResult> GetMessageForEditAsync(Guid id)
         {
@@ -247,7 +247,7 @@ namespace Test.Controllers
             return BadRequest("خطایی رخ داده است");
         }
 
-        [HttpGet]
+        [HttpGet("getForReply/{id}")]
         [Authorize]
         public async Task<IActionResult> GetReplyMessageAsync(Guid replyToMessageId)
         {
@@ -256,7 +256,7 @@ namespace Test.Controllers
             return Ok(await _messageServices.GetReplyMessageAsync(senderId, replyToMessageId));
         }
 
-        [HttpGet]
+        [HttpGet("getForRead")]
         [Authorize]
         public async Task<IActionResult> GetMessageForRead(Guid messageId, Guid recieverId)
         {
